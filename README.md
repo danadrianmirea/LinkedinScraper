@@ -1,1 +1,1 @@
-"EasyApplyLinkedin" 
+EasyApplyLinkedin

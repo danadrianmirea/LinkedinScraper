@@ -10,6 +10,13 @@ def chromeBrowserOptions():
     options.add_argument("--disable-extensions")
     options.add_argument('--disable-gpu')
     options.add_argument('--disable-dev-shm-usage')
+    
+    options.add_argument("--log-level=3")  
+    options.add_argument("--disable-webrtc")
+    options.add_argument("--disable-features=WebRTC")
+    options.add_argument("--disable-features=WebRtcHideLocalIpsWithMdns")
+    options.add_argument("--disable-webassembly")
+
     if(config.headless):
         options.add_argument("--headless")
     options.add_argument("--start-maximized")
@@ -25,6 +32,8 @@ def chromeBrowserOptions():
     else:
         options.add_argument("--incognito")
     return options
+
+
 
 def prRed(prt):
     print(f"\033[91m{prt}\033[00m")

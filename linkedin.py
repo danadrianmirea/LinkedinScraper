@@ -2,35 +2,37 @@ import time,math,random,os
 import utils,constants,config
 import pickle, hashlib
 
+import logging
+
 from selenium import webdriver
 from selenium.webdriver.common.by import By
 
 from webdriver_manager.chrome import ChromeDriverManager
 from selenium.webdriver.chrome.service import Service as ChromeService
+from selenium.webdriver.chrome.options import Options
 
+from selenium.common.exceptions import *
+
+DEBUG = True
+
+timeframe=2
+java=1
+toate=1
+outputFile = open("output_apply.txt", "w")
+logging.basicConfig(level=logging.WARNING)
+
+def log(s):
+    if DEBUG:
+        print(s)
+        
 class Linkedin:
     def __init__(self):
-            utils.prYellow("🤖 Thanks for using Easy Apply Jobs bot, for more information you can visit our site - www.automated-bots.com")
-            utils.prYellow("🌐 Bot will run in Chrome browser and log in Linkedin for you.")
             self.driver = webdriver.Chrome(service=ChromeService(ChromeDriverManager().install()),options=utils.chromeBrowserOptions())
             self.cookies_path = f"{os.path.join(os.getcwd(),'cookies')}/{self.getHash(config.email)}.pkl"
-            self.driver.get('https://www.linkedin.com')
-            self.loadCookies()
-
-            if not self.isLoggedIn():
-                self.driver.get("https://www.linkedin.com/login?trk=guest_homepage-basic_nav-header-signin")
-                utils.prYellow("🔄 Trying to log in Linkedin...")
-                try:    
-                    self.driver.find_element("id","username").send_keys(config.email)
-                    time.sleep(2)
-                    self.driver.find_element("id","password").send_keys(config.password)
-                    time.sleep(2)
-                    self.driver.find_element("xpath",'//button[@type="submit"]').click()
-                    time.sleep(30)
-                except:
-                    utils.prRed("❌ Couldn't log in Linkedin by using Chrome. Please check your Linkedin credentials on config files line 7 and 8.")
-
-                self.saveCookies()
+            self.driver.get("https://www.linkedin.com/login?trk=guest_homepage-basic_nav-header-signin")
+            
+            utils.prYellow("Please log in to LinkedIn now.")
+            
             # start application
             self.linkJobApply()
 
@@ -57,18 +59,22 @@ class Linkedin:
         return False 
     
     def generateUrls(self):
+        global time,java, outputFile
+        
         if not os.path.exists('data'):
             os.makedirs('data')
         try: 
             with open('data/urlData.txt', 'w',encoding="utf-8" ) as file:
-                linkedinJobLinks = utils.LinkedinUrlGenerate().generateUrlLinks()
+                linkedinJobLinks = ["https://www.linkedin.com/jobs/search/?currentJobId=4012159218&f_WT=3%2C1&geoId=105773754&keywords=c%2B%2B&location=Bucharest%2C%20Romania&origin=JOB_SEARCH_PAGE_JOB_FILTER&refresh=true"]
                 for url in linkedinJobLinks:
                     file.write(url+ "\n")
-            utils.prGreen("✅ Apply urls are created successfully, now the bot will visit those urls.")
+            utils.prGreen("Apply urls are created successfully, now the bot will visit those urls.")
         except:
-            utils.prRed("❌ Couldn't generate urls, make sure you have editted config file line 25-39")
+            utils.prRed("Couldn't generate urls, make sure you have editted config file line 25-39")
 
     def linkJobApply(self):
+        global timeframe,java, outputFile
+        
         self.generateUrls()
         countApplied = 0
         countJobs = 0
@@ -79,10 +85,14 @@ class Linkedin:
             self.driver.get(url)
             time.sleep(random.uniform(1, constants.botSpeed))
 
+            utils.prGreen("Press ENTER to start script...")
+            input()
+
             totalJobs = self.driver.find_element(By.XPATH,'//small').text 
             totalPages = utils.jobsToPages(totalJobs)
 
             urlWords =  utils.urlToKeywords(url)
+            urlWords = ["none", "none"]
             lineToWrite = "\n Category: " + urlWords[0] + ", Location: " +urlWords[1] + ", Applying " +str(totalJobs)+ " jobs."
             self.displayWriteResults(lineToWrite)
 
@@ -98,10 +108,12 @@ class Linkedin:
                 time.sleep(random.uniform(1, constants.botSpeed))
 
                 for offer in offersPerPage:
-                    if not self.element_exists(offer, By.XPATH, ".//*[contains(text(), 'Applied')]"):
-                        offerId = offer.get_attribute("data-occludable-job-id")
-                        offerIds.append(int(offerId.split(":")[-1]))
-
+                    try:
+                       offerId = offer.get_attribute("data-occludable-job-id")
+                       offerIds.append(int(offerId.split(":")[-1]))
+                    except Exception as e: 
+                        continue                    
+                        
                 for jobID in offerIds:
                     offerPage = 'https://www.linkedin.com/jobs/view/' + str(jobID)
                     self.driver.get(offerPage)
@@ -110,66 +122,96 @@ class Linkedin:
                     countJobs += 1
 
                     jobProperties = self.getJobProperties(countJobs)
-                    if "blacklisted" in jobProperties: 
-                        lineToWrite = jobProperties + " | " + "* 🤬 Blacklisted Job, skipped!: " +str(offerPage)
-                        self.displayWriteResults(lineToWrite)
                     
-                    else :                    
-                        easyApplybutton = self.easyApplyButton()
-
-                        if easyApplybutton is not False:
-                            easyApplybutton.click()
-                            time.sleep(random.uniform(1, constants.botSpeed))
+                    jobDescription = self.getJobDescription()
+                    
+                    #first check if title and job description contain any of the goodTitles
+                    goodTitles = ["c++", "java", "python", "c#", "embedded"]
+                    goodDescriptions = ["c++", "java", "python", "c#", "embedded"]
+                    
+                    goodTitles = ["c++", "embedded"]
+                    goodDescriptions = ["c++"]
+                    
+                    checkTitle=1
+                    checkDescription=1
+                    checkBadDescription=1
+                    
+                    if checkTitle:
+                        foundGoodTitle=False
+                        for title in goodTitles:
+                            if title in jobProperties.lower():
+                                foundGoodTitle=True
+                                break;   
                             
-                            try:
-                                self.chooseResume()
-                                self.driver.find_element(By.CSS_SELECTOR, "button[aria-label='Submit application']").click()
-                                time.sleep(random.uniform(1, constants.botSpeed))
-
-                                lineToWrite = jobProperties + " | " + "* 🥳 Just Applied to this job: "  +str(offerPage)
+                        if foundGoodTitle is False:
+                                lineToWrite = " | " + "* no good title found in job title, skipping: "
                                 self.displayWriteResults(lineToWrite)
-                                countApplied += 1
-
-                            except:
-                                try:
-                                    self.driver.find_element(By.CSS_SELECTOR,"button[aria-label='Continue to next step']").click()
-                                    time.sleep(random.uniform(1, constants.botSpeed))
-                                    self.chooseResume()
-                                    comPercentage = self.driver.find_element(By.XPATH,'html/body/div[3]/div/div/div[2]/div/div/span').text
-                                    percenNumber = int(comPercentage[0:comPercentage.index("%")])
-                                    result = self.applyProcess(percenNumber,offerPage)
-                                    lineToWrite = jobProperties + " | " + result
-                                    self.displayWriteResults(lineToWrite)
+                                continue;   
                                 
-                                except Exception: 
-                                    self.chooseResume()
-                                    lineToWrite = jobProperties + " | " + "* 🥵 Cannot apply to this Job! " +str(offerPage)
-                                    self.displayWriteResults(lineToWrite)
-                        else:
-                            lineToWrite = jobProperties + " | " + "* 🥳 Already applied! Job: " +str(offerPage)
+                    if checkDescription:  
+                        foundGoodDesc=False
+                        for desc in goodDescriptions:
+                            if desc in jobDescription.lower():
+                                foundGoodDesc=True
+                                break;  
+                                
+                        if foundGoodDesc is False:
+                                lineToWrite = " | " + "* no good description found in job description, skipping: "
+                                self.displayWriteResults(lineToWrite)
+                                continue;      
+                            
+                    if checkBadDescription:
+                        foundBadDesc = False;         
+                        for title in ["game", "gaming", "unity3d", "unreal", "gameplay"]:
+                            if title in jobDescription.lower():
+                                foundBadDesc = True
+                                break;
+                                
+                        if foundBadDesc is True:
+                            lineToWrite = " | " + "* found bad title in jobDescription: " + title
                             self.displayWriteResults(lineToWrite)
+                            continue;       
 
-
+                            
+                    # TODO make the script output the Non Easy Apply jobs to a file by checking for the
+                    # button's innerHTML ("Easy Apply" vs "Apply")
+                    # do this so that they can be checked later on
+ 
+                    #if java:
+                    #    #this means not in title
+                    #    if "java" not in jobProperties.lower():
+                    #        lineToWrite = " | " + "* java not found in jobDescription: "
+                    #        self.displayWriteResults(lineToWrite)
+                    #        continue;                                            
+                    #    #this means not in description
+                    #    if "java" not in jobDescription.lower():
+                    #        lineToWrite = " | " + "* java not found in jobDescription: "
+                    #        self.displayWriteResults(lineToWrite)
+                    #        continue;
+                    #elif "c++" not in jobDescription.lower():
+                    #    lineToWrite = " | " + "* C++ not found in jobDescription: "
+                    #    self.displayWriteResults(lineToWrite)
+                    #    continue;
+                                        
+                    if "blacklisted" in jobProperties.lower():
+                        lineToWrite = jobProperties + " | " + "* Blacklisted Job, skipped!: " +str(offerPage)
+                        self.displayWriteResults(lineToWrite)
+                        continue
+                        
+                    if "blacklisted" in jobDescription.lower():
+                        lineToWrite = jobProperties + " | " + "* Blacklisted Job Description, skipped!: " +str(offerPage)
+                        self.displayWriteResults(lineToWrite)
+                        continue
+                                                             
+                    utils.prYellow("Am scris in fisier " + offerPage + "\n")
+                    outputFile.write(offerPage + "\n")
+                    outputFile.flush()
+ 
+                    lineToWrite = jobProperties + " | " + "* Saved job to " + outputFile + ". " +str(offerPage)
+                    self.displayWriteResults(lineToWrite)
+                    
             utils.prYellow("Category: " + urlWords[0] + "," +urlWords[1]+ " applied: " + str(countApplied) +
                   " jobs out of " + str(countJobs) + ".")
-        
-        utils.donate(self)
-
-    def chooseResume(self):
-        try:
-            self.driver.find_element(
-                By.CLASS_NAME, "jobs-document-upload__title--is-required")
-            resumes = self.driver.find_elements(
-                By.XPATH, "//div[contains(@class, 'ui-attachment--pdf')]")
-            if (len(resumes) == 1 and resumes[0].get_attribute("aria-label") == "Select this resume"):
-                resumes[0].click()
-            elif (len(resumes) > 1 and resumes[config.preferredCv-1].get_attribute("aria-label") == "Select this resume"):
-                resumes[config.preferredCv-1].click()
-            elif (type(len(resumes)) != int):
-                utils.prRed(
-                    "❌ No resume has been selected please add at least one resume to your Linkedin account.")
-        except:
-            pass
 
     def getJobProperties(self, count):
         textToWrite = ""
@@ -183,11 +225,11 @@ class Linkedin:
                 jobTitle += "(blacklisted title: " + ' '.join(res) + ")"
         except Exception as e:
             if (config.displayWarnings):
-                utils.prYellow("⚠️ Warning in getting jobTitle: " + str(e)[0:50])
+                utils.prYellow("Warning in getting jobTitle: " + str(e)[0:50])
             jobTitle = ""
 
         try:
-            time.sleep(5)
+            #time.sleep(5)
             jobDetail = self.driver.find_element(By.XPATH, "//div[contains(@class, 'job-details-jobs')]//div").text.replace("·", "|")
             res = [blItem for blItem in config.blacklistCompanies if (blItem.lower() in jobTitle.lower())]
             if (len(res) > 0):
@@ -195,7 +237,7 @@ class Linkedin:
         except Exception as e:
             if (config.displayWarnings):
                 print(e)
-                utils.prYellow("⚠️ Warning in getting jobDetail: " + str(e)[0:100])
+                utils.prYellow("Warning in getting jobDetail: " + str(e)[0:100])
             jobDetail = ""
 
         try:
@@ -206,11 +248,28 @@ class Linkedin:
         except Exception as e:
             if (config.displayWarnings):
                 print(e)
-                utils.prYellow("⚠️ Warning in getting jobLocation: " + str(e)[0:100])
+                utils.prYellow("Warning in getting jobLocation: " + str(e)[0:100])
             jobLocation = ""
 
         textToWrite = str(count) + " | " + jobTitle +" | " + jobDetail + jobLocation
         return textToWrite
+
+    def getJobDescription(self):
+        description = " "
+        try:
+            description= self.driver.find_element(By.ID,"job-details").get_attribute("innerHTML").strip()
+            if(len(config.blackListDescription) > 0):
+                res = [blItem for blItem in config.blackListDescription if(blItem.lower() in description.lower())]
+                if (len(res)>0):
+                    description += "(blacklisted description: "+ ' '.join(res)+ ")"
+                    print("***** Blacklisted description: "+ ' '.join(res))
+        except Exception as e:
+            if(config.displayWarnings):
+                prYellow("Warning in getting job description: " +str(e)[0:50])
+            description = ""
+
+        return description
+
 
     def easyApplyButton(self):
         try:
@@ -243,13 +302,35 @@ class Linkedin:
         result = "* 🥳 Just Applied to this job: " + str(offerPage)
 
         return result
+        
+    def saveOfferToFile(self, percentage, offerPage):
+        applyPages = math.floor(100 / percentage) - 2 
+        result = ""
+        for pages in range(applyPages):  
+            self.driver.find_element(By.CSS_SELECTOR, "button[aria-label='Continue to next step']").click()
+
+        self.driver.find_element( By.CSS_SELECTOR, "button[aria-label='Review your application']").click()
+        time.sleep(random.uniform(1, constants.botSpeed))
+
+        if config.followCompanies is False:
+            try:
+                self.driver.find_element(By.CSS_SELECTOR, "label[for='follow-company-checkbox']").click()
+            except:
+                pass
+
+        self.driver.find_element(By.CSS_SELECTOR, "button[aria-label='Submit application']").click()
+        time.sleep(random.uniform(1, constants.botSpeed))
+
+        result = "* 🥳 Just Applied to this job: " + str(offerPage)
+
+        return result        
 
     def displayWriteResults(self,lineToWrite: str):
         try:
             print(lineToWrite)
             utils.writeResults(lineToWrite)
         except Exception as e:
-            utils.prRed("❌ Error in DisplayWriteResults: " +str(e))
+            utils.prRed("Error in DisplayWriteResults: " +str(e))
 
     def element_exists(self, parent, by, selector):
         return len(parent.find_elements(by, selector)) > 0
@@ -258,3 +339,4 @@ start = time.time()
 Linkedin().linkJobApply()
 end = time.time()
 utils.prYellow("---Took: " + str(round((time.time() - start)/60)) + " minute(s).")
+outputFile.close()

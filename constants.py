@@ -7,6 +7,8 @@ globalLogicUrl = "https://www.globallogic.com/career-search-page/"
 
 jobsPerPage = 25
 
+gigafast = 0.1
+faster = 1
 fast = 2
 medium = 3
 slow = 5 

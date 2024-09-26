@@ -165,7 +165,7 @@ class Linkedin:
                         self.displayWriteResults(lineToWrite)
                         continue
                                                              
-                    utils.prYellow("Am scris in fisier " + offerPage + "\n")
+                    utils.prYellow("Saved job to File: " + offerPage + "\n")
                     outputFile.write(offerPage + "\n")
                     outputFile.flush()
  
@@ -261,7 +261,7 @@ class Linkedin:
         self.driver.find_element(By.CSS_SELECTOR, "button[aria-label='Submit application']").click()
         time.sleep(random.uniform(1, constants.botSpeed))
 
-        result = "* 🥳 Just Applied to this job: " + str(offerPage)
+        result = "* Just Applied to this job: " + str(offerPage)
 
         return result
         
@@ -283,7 +283,7 @@ class Linkedin:
         self.driver.find_element(By.CSS_SELECTOR, "button[aria-label='Submit application']").click()
         time.sleep(random.uniform(1, constants.botSpeed))
 
-        result = "* 🥳 Just Applied to this job: " + str(offerPage)
+        result = "* Just Applied to this job: " + str(offerPage)
 
         return result        
 

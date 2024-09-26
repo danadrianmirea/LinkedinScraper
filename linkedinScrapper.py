@@ -122,27 +122,10 @@ class Linkedin:
             
             # start application
             self.scrape()
-
-    def getHash(self, string):
-        return hashlib.md5(string.encode('utf-8')).hexdigest()
-  
-    def isLoggedIn(self):
-        self.driver.get('https://www.linkedin.com/feed')
-        try:
-            self.driver.find_element(By.XPATH,'//*[@id="ember14"]')
-            return True
-        except:
-            pass
-        return False 
-    
-    def generateUrls(self):
-        global time,java, outputFile, linkedinJobLinks
-        
-
+      
     def scrape(self):
         global timeframe,java, outputFile
         
-        self.generateUrls()
         countApplied = 0
         countJobs = 0
 
@@ -313,9 +296,6 @@ class Linkedin:
 
     def prYellow(self,lineToWrite: str):
         prYellow(lineToWrite)
-
-    def element_exists(self, parent, by, selector):
-        return len(parent.find_elements(by, selector)) > 0
 
 start = time.time()
 Linkedin().scrape()

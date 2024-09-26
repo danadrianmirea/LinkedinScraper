@@ -43,7 +43,7 @@ blacklistCompanies = ["luxoft", "rinf", "sii", "orion", "luxolis", "crossover", 
 blackListTitles = ""
 blackListTitles = ["manager", "lead", "architect", "design", "devops", "devsecops", "security", "cyber", "crypto", "principal", "staff", "associate", "qa", 
                    "frontend", "fullstack", "backend", "web", "cisco", "reliability", "head", "machine learning", "angular", "ruby", "integrator", 
-                   "angular", "react", "french", "mobile", "mac", "german", "spring", "java"]
+                   "angular", "react", "french", "mobile", "mac", "german", "spring", "java", "automation"]
 blackListDescription = ""
 #blackListDescription = ["game", "gaming", "unity", "unity3d", "unreal", "gameplay"]
 #blackListDescription = ["devops", "devsecops", "cyber", "crypto", "principal", "associate", "game", "gaming", "gameplay", "java", "html", "web", "cisco", "cloud", "machine learning", "angular", "ruby", "statistical", "integrator", "animation", "sii", "node", "react", "french"]
@@ -52,13 +52,6 @@ blackListDescription = ""
 # and promoted jobs not respecting search terms. Make the script work logged out
 
 # TODO: remove class
-
-def urlToKeywords(url: str) -> List[str]:
-    keywordUrl = url[url.index("keywords=")+9:]
-    keyword = keywordUrl[0:keywordUrl.index("&") ] 
-    locationUrl =  url[url.index("location=")+9:]
-    location = locationUrl[0:locationUrl.index("&") ] 
-    return [keyword,location]
 
 def jobsToPages(numOfJobs: str) -> int:
   number_of_pages = 1
@@ -159,9 +152,6 @@ class Linkedin:
 
             totalJobs = self.driver.find_element(By.XPATH,'//small').text 
             totalPages = jobsToPages(totalJobs)
-
-            urlWords =  urlToKeywords(url)
-            urlWords = ["none", "none"]
             prYellow("Parsing " +str(totalJobs)+ " jobs.")
 
             for page in range(totalPages):

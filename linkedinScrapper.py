@@ -111,8 +111,6 @@ def prYellow(prt):
         
 def scrape():
     global timeframe,java, outputFile
-    
-    countApplied = 0
     countJobs = 0
 
     for url in linkedinJobLinks:        

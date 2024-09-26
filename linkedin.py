@@ -13,6 +13,21 @@ from selenium.webdriver.chrome.options import Options
 
 from selenium.common.exceptions import *
 
+from typing import List
+
+jobsPerPage = 25
+faster = 1
+fast = 2
+medium = 3
+slow = 5 
+botSpeed = fast
+
+# Webdriver Elements 
+totalJobs = "//small"
+offersPerPage = "//li[@data-occludable-job-id]"
+easyApplyButton = '//button[contains(@class, "jobs-apply-button")]'
+
+
 DEBUG = True
 
 linkedinJobLinks = ["https://www.linkedin.com/jobs/search/?currentJobId=4012159218&f_WT=3%2C1&geoId=105773754&keywords=c%2B%2B&location=Bucharest%2C%20Romania&origin=JOB_SEARCH_PAGE_JOB_FILTER&refresh=true"]
@@ -37,13 +52,11 @@ class Linkedin:
             
             # uncomment these and put your own credentials
             #self.driver.find_element("id","username").send_keys("")
-            #self.driver.find_element("id","password").send_keys("")
+            #self.driver.find_element("id","password").send_keys("")    
             self.driver.find_element("xpath",'//button[@type="submit"]').click()
                   
             utils.prYellow("Please log in to LinkedIn now, and then press ENTER.")
             input()
-            
-            
             
             # start application
             self.linkJobApply()

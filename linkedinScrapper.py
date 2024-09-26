@@ -24,17 +24,10 @@ offersPerPage = "//li[@data-occludable-job-id]"
 outputFile = open("output.txt", "w+")
 logging.basicConfig(level=logging.WARNING)
 
-browser = ["Chrome"]
 headless = False
 chromeProfilePath = r""
 location = "Bucharest, Romania"
 keywords = ["c++", "developer", "engineer", "c"]
-experienceLevels = [ "Internship", "Entry level" , "Associate" , "Mid-Senior level" ]
-datePosted = ["Any Time"]
-jobType = ["Full-time"]
-remote = ["Remote" , "Hybrid"]
-salary = [ "$80,000+"]
-sort = ["Recent"]
 blacklistCompanies = ""
 blacklistCompanies = ["luxoft", "rinf", "sii", "orion", "luxolis", "crossover", "randstad", "opentalent", "playrix", "amazon",
                       "consulting", "nagarro", "crowdstrike", "globallogic", "oasis", "techteamz", "xpert", "talent", 

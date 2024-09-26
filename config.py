@@ -1,5 +1,3 @@
-# General bot settings to use Pro settings you need to download Pro version from: www.automated-bots.com
-
 browser = ["Chrome"]
 headless = False
 

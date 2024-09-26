@@ -68,7 +68,7 @@ def jobsToPages(numOfJobs: str) -> int:
     spaceIndex = numOfJobs.index(' ')
     totalJobs = (numOfJobs[0:spaceIndex])
     totalJobs_int = int(totalJobs.replace(',', ''))
-    number_of_pages = math.ceil(totalJobs_int/constants.jobsPerPage)
+    number_of_pages = math.ceil(totalJobs_int/jobsPerPage)
     if (number_of_pages > 40 ): number_of_pages = 40
 
   else:
@@ -168,7 +168,7 @@ class Linkedin:
 
         for url in linkedinJobLinks:        
             self.driver.get(url)
-            time.sleep(random.uniform(1, constants.botSpeed))
+            time.sleep(random.uniform(1, botSpeed))
 
             totalJobs = self.driver.find_element(By.XPATH,'//small').text 
             totalPages = jobsToPages(totalJobs)
@@ -179,15 +179,15 @@ class Linkedin:
             self.displayWriteResults(lineToWrite)
 
             for page in range(totalPages):
-                currentPageJobs = constants.jobsPerPage * page
+                currentPageJobs = jobsPerPage * page
                 url = url +"&start="+ str(currentPageJobs)
                 self.driver.get(url)
-                time.sleep(random.uniform(1, constants.botSpeed))
+                time.sleep(random.uniform(1, botSpeed))
 
                 offersPerPage = self.driver.find_elements(By.XPATH, '//li[@data-occludable-job-id]')
                 offerIds = [(offer.get_attribute(
                     "data-occludable-job-id").split(":")[-1]) for offer in offersPerPage]
-                time.sleep(random.uniform(1, constants.botSpeed))
+                time.sleep(random.uniform(1, botSpeed))
 
                 for offer in offersPerPage:
                     try:
@@ -199,7 +199,7 @@ class Linkedin:
                 for jobID in offerIds:
                     offerPage = 'https://www.linkedin.com/jobs/view/' + str(jobID)
                     self.driver.get(offerPage)
-                    time.sleep(random.uniform(1, constants.botSpeed))
+                    time.sleep(random.uniform(1, botSpeed))
 
                     countJobs += 1
                     prYellow("Checking job at index " + str(countJobs))
@@ -228,7 +228,7 @@ class Linkedin:
                                 break
                             
                         if foundGoodTitle is False:
-                                lineToWrite = "No good title found in job title, skipping" + str(offerPage)
+                                lineToWrite = "No good title found in job title, skipping: " + str(offerPage)
                                 self.displayWriteResults(lineToWrite)
                                 continue
                                 
@@ -268,7 +268,7 @@ class Linkedin:
                     
                     jobAlreadySaved = False
                     fileContent = outputFile.read()                
-                    if jobID in fileContent:
+                    if str(jobID) in fileContent:
                         jobAlreadySaved = True
                         break
      
@@ -348,7 +348,7 @@ class Linkedin:
 
     def easyApplyButton(self):
         try:
-            time.sleep(random.uniform(1, constants.botSpeed))
+            time.sleep(random.uniform(1, botSpeed))
             button = self.driver.find_element(By.XPATH, "//div[contains(@class,'jobs-apply-button--top-card')]//button[contains(@class, 'jobs-apply-button')]")
             EasyApplyButton = button
         except: 
@@ -363,7 +363,7 @@ class Linkedin:
             self.driver.find_element(By.CSS_SELECTOR, "button[aria-label='Continue to next step']").click()
 
         self.driver.find_element( By.CSS_SELECTOR, "button[aria-label='Review your application']").click()
-        time.sleep(random.uniform(1, constants.botSpeed))
+        time.sleep(random.uniform(1, botSpeed))
 
         if config.followCompanies is False:
             try:
@@ -372,7 +372,7 @@ class Linkedin:
                 pass
 
         self.driver.find_element(By.CSS_SELECTOR, "button[aria-label='Submit application']").click()
-        time.sleep(random.uniform(1, constants.botSpeed))
+        time.sleep(random.uniform(1, botSpeed))
 
         result = "* Just Applied to this job: " + str(offerPage)
 
@@ -385,7 +385,7 @@ class Linkedin:
             self.driver.find_element(By.CSS_SELECTOR, "button[aria-label='Continue to next step']").click()
 
         self.driver.find_element( By.CSS_SELECTOR, "button[aria-label='Review your application']").click()
-        time.sleep(random.uniform(1, constants.botSpeed))
+        time.sleep(random.uniform(1, botSpeed))
 
         if config.followCompanies is False:
             try:
@@ -394,7 +394,7 @@ class Linkedin:
                 pass
 
         self.driver.find_element(By.CSS_SELECTOR, "button[aria-label='Submit application']").click()
-        time.sleep(random.uniform(1, constants.botSpeed))
+        time.sleep(random.uniform(1, botSpeed))
 
         result = "* Just Applied to this job: " + str(offerPage)
 

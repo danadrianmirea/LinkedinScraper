@@ -22,7 +22,7 @@ linkedinJobLinks = ["https://www.linkedin.com/jobs/search/?currentJobId=40121592
 timeframe=2
 java=1
 toate=1
-outputFile = open("output_apply.txt", "w+")
+outputFile = open("output.txt", "w+")
 logging.basicConfig(level=logging.WARNING)
 
 browser = ["Chrome"]
@@ -50,6 +50,8 @@ blackListDescription = ""
 
 # TODO: i have a feeling that not being logged in provides better search results on LinkedIn due to algorithm idiocy 
 # and promoted jobs not respecting search terms. Make the script work logged out
+
+# TODO: remove class
 
 def urlToKeywords(url: str) -> List[str]:
     keywordUrl = url[url.index("keywords=")+9:]
@@ -126,7 +128,7 @@ class Linkedin:
             input()
             
             # start application
-            self.linkJobApply()
+            self.scrape()
 
     def getHash(self, string):
         return hashlib.md5(string.encode('utf-8')).hexdigest()
@@ -144,7 +146,7 @@ class Linkedin:
         global time,java, outputFile, linkedinJobLinks
         
 
-    def linkJobApply(self):
+    def scrape(self):
         global timeframe,java, outputFile
         
         self.generateUrls()
@@ -160,7 +162,7 @@ class Linkedin:
 
             urlWords =  urlToKeywords(url)
             urlWords = ["none", "none"]
-            prYellow("Applying to " +str(totalJobs)+ " jobs.")
+            prYellow("Parsing " +str(totalJobs)+ " jobs.")
 
             for page in range(totalPages):
                 currentPageJobs = jobsPerPage * page
@@ -326,7 +328,7 @@ class Linkedin:
         return len(parent.find_elements(by, selector)) > 0
 
 start = time.time()
-Linkedin().linkJobApply()
+Linkedin().scrape()
 end = time.time()
 prYellow("---Took: " + str(round((time.time() - start)/60)) + " minute(s).")
 outputFile.close()

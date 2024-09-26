@@ -25,6 +25,9 @@ def log(s):
     if DEBUG:
         print(s)
         
+# TODO: i have a feeling that not being logged in provides better search results on LinkedIn due to algorithm idiocy 
+# and promoted jobs not respecting search terms. Make the script work logged out
+        
 class Linkedin:
     def __init__(self):
             self.driver = webdriver.Chrome(service=ChromeService(ChromeDriverManager().install()),options=utils.chromeBrowserOptions())

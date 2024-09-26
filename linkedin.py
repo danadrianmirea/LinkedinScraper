@@ -165,7 +165,7 @@ class Linkedin:
                         self.displayWriteResults(lineToWrite)
                         continue
                                                              
-                    utils.prYellow("Saved job to File: " + offerPage + "\n")
+                    utils.prYellow("Saved job to File: " + offerPage)
                     outputFile.write(offerPage + "\n")
                     outputFile.flush()
                      

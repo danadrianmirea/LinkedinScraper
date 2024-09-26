@@ -108,12 +108,12 @@ class Linkedin:
                     jobDescription = self.getJobDescription()
                     
                     #first check if title and job description contain any of the goodTitles
-                    goodTitles = ["c", "c++", "java", "python", "c#", "embedded"]
-                    goodDescriptions = ["c", "c++", "java", "python", "c#", "embedded"]
+                    goodTitles = [" c ", "c++", "java", "python", "c#", "embedded"]
+                    goodDescriptions = ["c ", "c++", "java", "python", "c#", "embedded"]
                     
-                    goodTitles = ["c++", "embedded", "c"]
-                    goodDescriptions = ["c++", "c"]
-                    badDescriptions = ["game", "gaming", "unity3d", "unreal", "gameplay"]
+                    goodTitles = ["c++", "embedded", " c "]
+                    goodDescriptions = ["c++", " c "]
+                    badDescriptions = ["game", "gaming", "unity", "unity3d", "unreal", "gameplay"]
                     
                     checkTitle=1
                     checkDescription=0
@@ -169,7 +169,7 @@ class Linkedin:
                     outputFile.write(offerPage + "\n")
                     outputFile.flush()
  
-                    lineToWrite = jobProperties + " | " + "* Saved job to " + outputFile + ". " +str(offerPage)
+                    lineToWrite = jobProperties + " | " + "* Saved job to " + str(outputFile) + ". " +str(offerPage)
                     self.displayWriteResults(lineToWrite)
                     
             utils.prYellow("Category: " + urlWords[0] + "," +urlWords[1]+ " applied: " + str(countApplied) +
@@ -179,13 +179,10 @@ class Linkedin:
         textToWrite = ""
         jobTitle = ""
         jobLocation = ""
-        
-        utils.prYellow("A intrat in getJobProperties")
 
         try:
             jobTitle = self.driver.find_element(By.XPATH, "//div[contains(@class, 'job-title')]").get_attribute("innerHTML").strip()
             res = [blItem for blItem in config.blackListTitles if (blItem.lower() in jobTitle.lower())]
-            utils.prYellow("Job title: " + jobTitle)
             if (len(res) > 0):
                 jobTitle += "(blacklisted title: " + ' '.join(res) + ")"
         except Exception as e:

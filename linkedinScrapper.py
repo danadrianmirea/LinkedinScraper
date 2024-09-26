@@ -19,13 +19,35 @@ botSpeed = fast
 # Webdriver Elements 
 totalJobs = "//small"
 offersPerPage = "//li[@data-occludable-job-id]"
-easyApplyButton = '//button[contains(@class, "jobs-apply-button")]'
 linkedinJobLinks = ["https://www.linkedin.com/jobs/search/?currentJobId=4012159218&f_WT=3%2C1&geoId=105773754&keywords=c%2B%2B&location=Bucharest%2C%20Romania&origin=JOB_SEARCH_PAGE_JOB_FILTER&refresh=true"]
 timeframe=2
 java=1
 toate=1
 outputFile = open("output_apply.txt", "r+")
 logging.basicConfig(level=logging.WARNING)
+
+browser = ["Chrome"]
+headless = False
+chromeProfilePath = r""
+location = "Bucharest, Romania"
+keywords = ["c++", "developer", "engineer", "c"]
+experienceLevels = [ "Internship", "Entry level" , "Associate" , "Mid-Senior level" ]
+datePosted = ["Any Time"]
+jobType = ["Full-time"]
+remote = ["Remote" , "Hybrid"]
+salary = [ "$80,000+"]
+sort = ["Recent"]
+blacklistCompanies = ""
+blacklistCompanies = ["luxoft", "rinf", "sii", "orion", "luxolis", "crossover", "randstad", "opentalent", "playrix", "amazon",
+                      "consulting", "nagarro", "crowdstrike", "globallogic", "oasis", "techteamz", "xpert", "talent", 
+                      "tlm", "kambi", "playtika", "mega image", "mpg", "avl", "von", "think-cell", "think", "smartchoice"];
+blackListTitles = ""
+blackListTitles = ["manager", "lead", "architect", "design", "devops", "devsecops", "security", "cyber", "crypto", "principal", "staff", "associate", "qa", 
+                   "frontend", "fullstack", "backend", "web", "cisco", "reliability", "head", "machine learning", "angular", "ruby", "integrator", 
+                   "angular", "react", "french", "mobile", "mac", "german", "spring", "java"]
+blackListDescription = ""
+#blackListDescription = ["game", "gaming", "unity", "unity3d", "unreal", "gameplay"]
+#blackListDescription = ["devops", "devsecops", "cyber", "crypto", "principal", "associate", "game", "gaming", "gameplay", "java", "html", "web", "cisco", "cloud", "machine learning", "angular", "ruby", "statistical", "integrator", "animation", "sii", "node", "react", "french"]
 
 # TODO: i have a feeling that not being logged in provides better search results on LinkedIn due to algorithm idiocy 
 # and promoted jobs not respecting search terms. Make the script work logged out
@@ -82,7 +104,7 @@ def getUrlDataFile():
         file = open('data/urlData.txt', 'r')
         urlData = file.readlines()
     except FileNotFoundError:
-        text = "FileNotFound:urlData.txt file is not found. Please run ./data folder exists and check config.py values of yours. Then run the bot again"
+        text = "FileNotFound:urlData.txt file is not found"
         prRed(text)
     return urlData
 
@@ -100,16 +122,16 @@ def chromeBrowserOptions():
     options.add_argument("--disable-features=WebRtcHideLocalIpsWithMdns")
     options.add_argument("--disable-webassembly")
 
-    if(config.headless):
+    if(headless):
         options.add_argument("--headless")
     options.add_argument("--start-maximized")
     options.add_argument("--disable-blink-features")
     options.add_argument("--disable-blink-features=AutomationControlled")
     options.add_experimental_option('useAutomationExtension', False)
     options.add_experimental_option("excludeSwitches", ["enable-automation"])
-    if(len(config.chromeProfilePath)>0):
-        initialPath = config.chromeProfilePath[0:config.chromeProfilePath.rfind("/")]
-        profileDir = config.chromeProfilePath[config.chromeProfilePath.rfind("/")+1:]
+    if(len(chromeProfilePath)>0):
+        initialPath = chromeProfilePath[0:chromeProfilePath.rfind("/")]
+        profileDir = chromeProfilePath[chromeProfilePath.rfind("/")+1:]
         options.add_argument('--user-data-dir=' +initialPath)
         options.add_argument("--profile-directory=" +profileDir)
     else:
@@ -291,23 +313,21 @@ class Linkedin:
 
         try:
             jobTitle = self.driver.find_element(By.XPATH, "//*[contains(@class, 'job-title')]").get_attribute("innerHTML").strip()
-            res = [blItem for blItem in config.blackListTitles if (blItem.lower() in jobTitle.lower())]
+            res = [blItem for blItem in blackListTitles if (blItem.lower() in jobTitle.lower())]
             if (len(res) > 0):
                 jobTitle = "(blacklisted title: " + ' '.join(res) + ")"
         except Exception as e:
-            if (config.displayWarnings):
-                prYellow("Warning in getting jobTitle: " + str(e)[0:50])
+            prYellow("Warning in getting jobTitle: " + str(e)[0:50])
             jobTitle = ""
 
         try:
             jobCompanyName = self.driver.find_element(By.XPATH, "//*[contains(@class, 'company-name')]").get_attribute("innerHTML").strip()
-            res = [blItem for blItem in config.blacklistCompanies if (blItem.lower() in jobCompanyName.lower())]
+            res = [blItem for blItem in blacklistCompanies if (blItem.lower() in jobCompanyName.lower())]
             if (len(res) > 0):
                 jobCompanyName = "(blacklisted company: " + ' '.join(res) + ")"
         except Exception as e:
-            if (config.displayWarnings):
-                print(e)
-                prYellow("Warning in getting jobDetail: " + str(e)[0:100])
+            print(e)
+            prYellow("Warning in getting jobDetail: " + str(e)[0:100])
             jobCompanyName = ""
 
         try:
@@ -316,9 +336,8 @@ class Linkedin:
                 jobLocation = jobLocation + " | " + span.text
 
         except Exception as e:
-            if (config.displayWarnings):
-                print(e)
-                prYellow("Warning in getting jobLocation: " + str(e)[0:100])
+            print(e)
+            prYellow("Warning in getting jobLocation: " + str(e)[0:100])
             jobLocation = ""
 
         if("blacklisted" in jobTitle):
@@ -333,73 +352,16 @@ class Linkedin:
         description = " "
         try:
             description= self.driver.find_element(By.ID,"job-details").get_attribute("innerHTML").strip()
-            if(len(config.blackListDescription) > 0):
-                res = [blItem for blItem in config.blackListDescription if(blItem.lower() in description.lower())]
+            if(len(blackListDescription) > 0):
+                res = [blItem for blItem in blackListDescription if(blItem.lower() in description.lower())]
                 if (len(res)>0):
                     description += "(blacklisted description: "+ ' '.join(res)+ ")"
                     print("***** Blacklisted description: "+ ' '.join(res))
         except Exception as e:
-            if(config.displayWarnings):
-                prYellow("Warning in getting job description: " +str(e)[0:50])
+            prYellow("Warning in getting job description: " +str(e)[0:50])
             description = ""
-
         return description
-
-
-    def easyApplyButton(self):
-        try:
-            time.sleep(random.uniform(1, botSpeed))
-            button = self.driver.find_element(By.XPATH, "//div[contains(@class,'jobs-apply-button--top-card')]//button[contains(@class, 'jobs-apply-button')]")
-            EasyApplyButton = button
-        except: 
-            EasyApplyButton = False
-
-        return EasyApplyButton
-
-    def applyProcess(self, percentage, offerPage):
-        applyPages = math.floor(100 / percentage) - 2 
-        result = ""
-        for pages in range(applyPages):  
-            self.driver.find_element(By.CSS_SELECTOR, "button[aria-label='Continue to next step']").click()
-
-        self.driver.find_element( By.CSS_SELECTOR, "button[aria-label='Review your application']").click()
-        time.sleep(random.uniform(1, botSpeed))
-
-        if config.followCompanies is False:
-            try:
-                self.driver.find_element(By.CSS_SELECTOR, "label[for='follow-company-checkbox']").click()
-            except:
-                pass
-
-        self.driver.find_element(By.CSS_SELECTOR, "button[aria-label='Submit application']").click()
-        time.sleep(random.uniform(1, botSpeed))
-
-        result = "* Just Applied to this job: " + str(offerPage)
-
-        return result
         
-    def saveOfferToFile(self, percentage, offerPage):
-        applyPages = math.floor(100 / percentage) - 2 
-        result = ""
-        for pages in range(applyPages):  
-            self.driver.find_element(By.CSS_SELECTOR, "button[aria-label='Continue to next step']").click()
-
-        self.driver.find_element( By.CSS_SELECTOR, "button[aria-label='Review your application']").click()
-        time.sleep(random.uniform(1, botSpeed))
-
-        if config.followCompanies is False:
-            try:
-                self.driver.find_element(By.CSS_SELECTOR, "label[for='follow-company-checkbox']").click()
-            except:
-                pass
-
-        self.driver.find_element(By.CSS_SELECTOR, "button[aria-label='Submit application']").click()
-        time.sleep(random.uniform(1, botSpeed))
-
-        result = "* Just Applied to this job: " + str(offerPage)
-
-        return result        
-
     def displayWriteResults(self,lineToWrite: str):
         try:
             print(lineToWrite)

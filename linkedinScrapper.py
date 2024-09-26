@@ -58,30 +58,6 @@ def urlToKeywords(url: str) -> List[str]:
     location = locationUrl[0:locationUrl.index("&") ] 
     return [keyword,location]
 
-def writeResults(text: str):
-    timeStr = time.strftime("%Y%m%d")
-    fileName = "Applied Jobs DATA - " +timeStr + ".txt"
-    try:
-        with open("data/" +fileName, encoding="utf-8" ) as file:
-            lines = []
-            for line in file:
-                if "----" not in line:
-                    lines.append(line)
-                
-        with open("data/" +fileName, 'w' ,encoding="utf-8") as f:
-            f.write("---- Applied Jobs Data ---- created at: " +timeStr+ "\n" )
-            f.write("---- Number | Job Title | Company | Location | Work Place | Posted Date | Applications | Result "   +"\n" )
-            for line in lines: 
-                f.write(line)
-            f.write(text+ "\n")
-            
-    except:
-        with open("data/" +fileName, 'w', encoding="utf-8") as f:
-            f.write("---- Applied Jobs Data ---- created at: " +timeStr+ "\n" )
-            f.write("---- Number | Job Title | Company | Location | Work Place | Posted Date | Applications | Result "   +"\n" )
-
-            f.write(text+ "\n")
-            
 def jobsToPages(numOfJobs: str) -> int:
   number_of_pages = 1
 
@@ -96,16 +72,6 @@ def jobsToPages(numOfJobs: str) -> int:
       number_of_pages = int(numOfJobs)
 
   return number_of_pages
-
-def getUrlDataFile():
-    urlData = ""
-    try:
-        file = open('data/urlData.txt', 'r')
-        urlData = file.readlines()
-    except FileNotFoundError:
-        text = "FileNotFound:urlData.txt file is not found"
-        prRed(text)
-    return urlData
 
 def chromeBrowserOptions():
     options = webdriver.ChromeOptions()
@@ -153,7 +119,7 @@ class Linkedin:
             
             # uncomment these and put your own credentials
             #self.driver.find_element("id","username").send_keys("")
-            #self.driver.find_element("id","password").send_keys("")    
+            #self.driver.find_element("id","password").send_keys("")
             self.driver.find_element("xpath",'//button[@type="submit"]').click()
                   
             prYellow("Please log in to LinkedIn now, and then press ENTER.")
@@ -185,8 +151,6 @@ class Linkedin:
         countApplied = 0
         countJobs = 0
 
-        urlData = getUrlDataFile()
-
         for url in linkedinJobLinks:        
             self.driver.get(url)
             time.sleep(random.uniform(1, botSpeed))
@@ -196,8 +160,7 @@ class Linkedin:
 
             urlWords =  urlToKeywords(url)
             urlWords = ["none", "none"]
-            lineToWrite = "\n Category: " + urlWords[0] + ", Location: " +urlWords[1] + ", Applying " +str(totalJobs)+ " jobs."
-            self.displayWriteResults(lineToWrite)
+            prYellow("Applying to " +str(totalJobs)+ " jobs.")
 
             for page in range(totalPages):
                 currentPageJobs = jobsPerPage * page
@@ -249,9 +212,8 @@ class Linkedin:
                                 break
                             
                         if foundGoodTitle is False:
-                                lineToWrite = "No good title found in job title, skipping: " + str(offerPage)
-                                self.displayWriteResults(lineToWrite)
-                                continue
+                            prYellow("No good title found in job title, skipping: " + str(offerPage))
+                            continue
                                 
                     if checkDescription and not "blacklisted" in jobDescription.lower():
                         foundGoodDesc=False
@@ -261,9 +223,8 @@ class Linkedin:
                                 break  
                                 
                         if foundGoodDesc is False:
-                                lineToWrite = "No good description found in job description, skipping: " + str(offerPage)
-                                self.displayWriteResults(lineToWrite)
-                                continue    
+                            prYellow("No good description found in job description, skipping: " + str(offerPage))
+                            continue    
                             
                     if checkBadDescription:
                         foundBadDesc = False;         
@@ -273,18 +234,15 @@ class Linkedin:
                                 break
                                 
                         if foundBadDesc is True:
-                            lineToWrite = "Found bad title in jobDescription: " + title
-                            self.displayWriteResults(lineToWrite)
+                            prYellow("Found bad title in jobDescription: " + title)
                             continue      
                  
                     if "blacklisted" in jobProperties.lower():
-                        lineToWrite = "Blacklisted Job, skipped: " +str(offerPage) + " reason: " + jobProperties
-                        self.displayWriteResults(lineToWrite)
+                        prYellow("Blacklisted Job, skipped: " +str(offerPage) + " reason: " + jobProperties)
                         continue
                         
                     if "blacklisted" in jobDescription.lower():
-                        lineToWrite = "Blacklisted Job description, skipped!: " +str(offerPage) + " reason: " + jobProperties
-                        self.displayWriteResults(lineToWrite)
+                        prYellow("Blacklisted Job description, skipped!: " +str(offerPage) + " reason: " + jobProperties)
                         continue
                     
                     jobAlreadySaved = False
@@ -360,13 +318,9 @@ class Linkedin:
             prYellow("Warning in getting job description: " +str(e)[0:50])
             description = ""
         return description
-        
-    def displayWriteResults(self,lineToWrite: str):
-        try:
-            print(lineToWrite)
-            writeResults(lineToWrite)
-        except Exception as e:
-            prRed("Error in DisplayWriteResults: " +str(e))
+
+    def prYellow(self,lineToWrite: str):
+        prYellow(lineToWrite)
 
     def element_exists(self, parent, by, selector):
         return len(parent.find_elements(by, selector)) > 0

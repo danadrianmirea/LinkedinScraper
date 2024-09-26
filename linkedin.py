@@ -109,8 +109,8 @@ class Linkedin:
                     time.sleep(random.uniform(1, constants.botSpeed))
 
                     countJobs += 1
-                    utils.prYellow("Checking job at index " + str(countJobs) + "/" + str(totalJobs))
-                                   
+                    utils.prYellow("Checking job at index " + str(countJobs)
+
                     jobProperties = self.getJobProperties(countJobs)
                     
                     jobDescription = self.getJobDescription()
@@ -135,7 +135,7 @@ class Linkedin:
                                 break
                             
                         if foundGoodTitle is False:
-                                lineToWrite = "No good title found in job title, skipping"
+                                lineToWrite = "No good title found in job title, skipping" + str(offerPage)
                                 self.displayWriteResults(lineToWrite)
                                 continue
                                 
@@ -147,7 +147,7 @@ class Linkedin:
                                 break  
                                 
                         if foundGoodDesc is False:
-                                lineToWrite = "No good description found in job description, skipping: "
+                                lineToWrite = "No good description found in job description, skipping: " + str(offerPage)
                                 self.displayWriteResults(lineToWrite)
                                 continue    
                             
@@ -175,7 +175,7 @@ class Linkedin:
                     
                     jobAlreadySaved = False
                     for fileLine in outputFile:
-                        if offerPage in fileLine:
+                        if jobID in fileLine:
                             jobAlreadySaved = True
                             break
      

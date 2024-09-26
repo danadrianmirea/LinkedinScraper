@@ -31,7 +31,6 @@ def log(s):
 class Linkedin:
     def __init__(self):
             self.driver = webdriver.Chrome(service=ChromeService(ChromeDriverManager().install()),options=utils.chromeBrowserOptions())
-            self.cookies_path = f"{os.path.join(os.getcwd(),'cookies')}/{self.getHash(config.email)}.pkl"
             self.driver.get("https://www.linkedin.com/login?trk=guest_homepage-basic_nav-header-signin")
             
             utils.prYellow("Please log in to LinkedIn now.")
@@ -41,17 +40,7 @@ class Linkedin:
 
     def getHash(self, string):
         return hashlib.md5(string.encode('utf-8')).hexdigest()
-
-    def loadCookies(self):
-        if os.path.exists(self.cookies_path):
-            cookies =  pickle.load(open(self.cookies_path, "rb"))
-            self.driver.delete_all_cookies()
-            for cookie in cookies:
-                self.driver.add_cookie(cookie)
-
-    def saveCookies(self):
-        pickle.dump(self.driver.get_cookies() , open(self.cookies_path,"wb"))
-    
+  
     def isLoggedIn(self):
         self.driver.get('https://www.linkedin.com/feed')
         try:

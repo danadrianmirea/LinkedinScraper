@@ -15,6 +15,8 @@ from selenium.common.exceptions import *
 
 DEBUG = True
 
+linkedinJobLinks = ["https://www.linkedin.com/jobs/search/?currentJobId=4012159218&f_WT=3%2C1&geoId=105773754&keywords=c%2B%2B&location=Bucharest%2C%20Romania&origin=JOB_SEARCH_PAGE_JOB_FILTER&refresh=true"]
+
 timeframe=2
 java=1
 toate=1
@@ -33,7 +35,8 @@ class Linkedin:
             self.driver = webdriver.Chrome(service=ChromeService(ChromeDriverManager().install()),options=utils.chromeBrowserOptions())
             self.driver.get("https://www.linkedin.com/login?trk=guest_homepage-basic_nav-header-signin")
             
-            utils.prYellow("Please log in to LinkedIn now.")
+            utils.prYellow("Please log in to LinkedIn now, and then press ENTER.")
+            input()
             
             # start application
             self.linkJobApply()
@@ -51,18 +54,8 @@ class Linkedin:
         return False 
     
     def generateUrls(self):
-        global time,java, outputFile
+        global time,java, outputFile, linkedinJobLinks
         
-        if not os.path.exists('data'):
-            os.makedirs('data')
-        try: 
-            with open('data/urlData.txt', 'w',encoding="utf-8" ) as file:
-                linkedinJobLinks = ["https://www.linkedin.com/jobs/search/?currentJobId=4012159218&f_WT=3%2C1&geoId=105773754&keywords=c%2B%2B&location=Bucharest%2C%20Romania&origin=JOB_SEARCH_PAGE_JOB_FILTER&refresh=true"]
-                for url in linkedinJobLinks:
-                    file.write(url+ "\n")
-            utils.prGreen("Apply urls are created successfully, now the bot will visit those urls.")
-        except:
-            utils.prRed("Couldn't generate urls, make sure you have editted config file line 25-39")
 
     def linkJobApply(self):
         global timeframe,java, outputFile
@@ -73,12 +66,9 @@ class Linkedin:
 
         urlData = utils.getUrlDataFile()
 
-        for url in urlData:        
+        for url in linkedinJobLinks:        
             self.driver.get(url)
             time.sleep(random.uniform(1, constants.botSpeed))
-
-            utils.prGreen("Press ENTER to start script...")
-            input()
 
             totalJobs = self.driver.find_element(By.XPATH,'//small').text 
             totalPages = utils.jobsToPages(totalJobs)
@@ -137,7 +127,7 @@ class Linkedin:
                                 break;   
                             
                         if foundGoodTitle is False:
-                                lineToWrite = " | " + "* no good title found in job title, skipping: "
+                                lineToWrite = "No good title found in job title, skipping: "
                                 self.displayWriteResults(lineToWrite)
                                 continue;   
                                 
@@ -149,7 +139,7 @@ class Linkedin:
                                 break;  
                                 
                         if foundGoodDesc is False:
-                                lineToWrite = " | " + "* no good description found in job description, skipping: "
+                                lineToWrite = "No good description found in job description, skipping: "
                                 self.displayWriteResults(lineToWrite)
                                 continue;      
                             
@@ -161,7 +151,7 @@ class Linkedin:
                                 break;
                                 
                         if foundBadDesc is True:
-                            lineToWrite = " | " + "* found bad title in jobDescription: " + title
+                            lineToWrite = "Found bad title in jobDescription: " + title
                             self.displayWriteResults(lineToWrite)
                             continue;       
 

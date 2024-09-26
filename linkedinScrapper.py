@@ -22,7 +22,7 @@ linkedinJobLinks = ["https://www.linkedin.com/jobs/search/?currentJobId=40121592
 timeframe=2
 java=1
 toate=1
-outputFile = open("output_apply.txt", "r+")
+outputFile = open("output_apply.txt", "w+")
 logging.basicConfig(level=logging.WARNING)
 
 browser = ["Chrome"]

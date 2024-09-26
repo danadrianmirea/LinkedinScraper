@@ -43,35 +43,5 @@ blackListDescription = ""
 followCompanies = False
 #Below settings are for linkedin bot Pro, you can purchase monthly or yearly subscription to use them from me.
 
-# These settings are for running GlobalLogic job apply bot you need to purchase GlobalLogic bot obtain bot password, paste below and then run the bot.
-GlobalLogicBotPassword = ""
-# AngelCO credits
-GlobalLogicEmail = ""
-GlobalLogicPassword = ""
-# Functions ex: ["Administration", "Business Development", "Business Solutions", "Content Engineering", 	
-# Delivery Enablement", Engineering, Finance, IT Infrastructure, Legal, Marketing, People Development,
-# Process Management, Product Support, Quality Assurance,Sales, Sales Enablement,Technology, Usability and Design]
-GlobalLogicFunctions = ["Engineering"]
-# Global logic experience: ["0-1 years", "1-3 years", "3-5 years", "5-10 years", "10-15 years","15+ years"]
-GlobalLogicExperience = ["0-1 years", "1-3 years"]
-# Global logic location filter: ["Argentina", "Chile", "Crotia", "Germany", "India","Japan", "Poland"
-# Romania, Sweden, Switzerland,Ukraine, United States]
-GlobalLogicLocation = ["poland"]
-# Freelance yes or no
-GlobalLogicFreelance = ["no"]
-# Remote work yes or no
-GlobalLogicRemoteWork = ["yes"]
-# Optional! Keyword:["javascript", "react", "angular", ""]
-GlobalLogicKeyword = ["react"]
-# Global Logic Job apply settinngs
-FirstName = "O"
-LastName = "D"
-Email = "asdsa@gmail.com"
-LinkedInProfileURL = "www.google.com"
-Phone = "" #OPTIONAL
-Location = "" #OPTIONAL
-HowDidYouHeard = "" #OPTIONAL
-ConsiderMeForFutureOffers = True #true = yes, false = no
-
  # Testing & Debugging features
 displayWarnings = False

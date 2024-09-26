@@ -1,1 +1,1 @@
-EasyApplyLinkedin
+A python script that uses Selenium to scrape jobs from LinkedIn. It has the option of positive matching on job title, company and description and on blacklisting based on the same fields. It saves the jobs that match the search in a file to be reviewed later.

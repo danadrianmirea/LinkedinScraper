@@ -1,5 +1,4 @@
 import time,math,random,os
-import config
 import pickle, hashlib
 import logging
 from selenium import webdriver

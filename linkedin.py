@@ -20,7 +20,7 @@ linkedinJobLinks = ["https://www.linkedin.com/jobs/search/?currentJobId=40121592
 timeframe=2
 java=1
 toate=1
-outputFile = open("output_apply.txt", "w")
+outputFile = open("output_apply.txt", "r+")
 logging.basicConfig(level=logging.WARNING)
 
 def log(s):
@@ -38,7 +38,6 @@ class Linkedin:
             # uncomment these and put your own credentials
             #self.driver.find_element("id","username").send_keys("")
             #self.driver.find_element("id","password").send_keys("")
-
             self.driver.find_element("xpath",'//button[@type="submit"]').click()
                   
             utils.prYellow("Please log in to LinkedIn now, and then press ENTER.")
@@ -173,10 +172,19 @@ class Linkedin:
                         lineToWrite = "Blacklisted Job description, skipped!: " +str(offerPage) + " reason: " + jobProperties
                         self.displayWriteResults(lineToWrite)
                         continue
-                                                             
-                    utils.prGreen("Saved job to File: " + offerPage)
-                    outputFile.write(offerPage + "\n")
-                    outputFile.flush()
+                    
+                    jobAlreadySaved = False
+                    for fileLine in outputFile:
+                        if offerPage in fileLine:
+                            jobAlreadySaved = True
+                            break
+     
+                    if not jobAlreadySaved:
+                        utils.prGreen("Saved job to File: " + offerPage)
+                        outputFile.write(offerPage + "\n")
+                        outputFile.flush()
+                    else:
+                        utils.prGreen("Job already saved: " + offerPage)
                      
             utils.prYellow("Category: " + urlWords[0] + "," +urlWords[1]+ " applied: " + str(countApplied) +
                   " jobs out of " + str(countJobs) + ".")

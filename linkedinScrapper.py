@@ -40,7 +40,7 @@ blackListDescription = ""
 #blackListDescription = ["game", "gaming", "unity", "unity3d", "unreal", "gameplay"]
 #blackListDescription = ["devops", "devsecops", "cyber", "crypto", "principal", "associate", "game", "gaming", "gameplay", "java", "html", "web", "cisco", "cloud", "machine learning", "angular", "ruby", "statistical", "integrator", "animation", "sii", "node", "react", "french"]
 
-# TODO: i have a feeling that not being logged in provides better search results on LinkedIn due to algorithm idiocy 
+# TODO: i have a feeling that not being logged in provides better search results on LinkedIn due to algorithm idiocy
 # and promoted jobs not respecting search terms. Make the script work logged out
 
 def jobsToPages(numOfJobs: str) -> int:
@@ -97,8 +97,6 @@ def prGreen(prt):
 def prYellow(prt):
     print(f"\033[93m{prt}\033[00m")
 
-
-        
 def scrape():
     global outputFile
     countJobs = 0
@@ -210,6 +208,7 @@ def getJobProperties(count):
     textToWrite = ""
     jobTitle = ""
     jobLocation = ""
+    
     time.sleep(5) # wait for page to load
 
     try:

@@ -179,10 +179,13 @@ class Linkedin:
         textToWrite = ""
         jobTitle = ""
         jobLocation = ""
+        
+        utils.prYellow("A intrat in getJobProperties")
 
         try:
-            jobTitle = self.driver.find_element(By.XPATH, "//h1[contains(@class, 'job-title')]").get_attribute("innerHTML").strip()
+            jobTitle = self.driver.find_element(By.XPATH, "//div[contains(@class, 'job-title')]").get_attribute("innerHTML").strip()
             res = [blItem for blItem in config.blackListTitles if (blItem.lower() in jobTitle.lower())]
+            utils.prYellow("Job title: " + jobTitle)
             if (len(res) > 0):
                 jobTitle += "(blacklisted title: " + ' '.join(res) + ")"
         except Exception as e:

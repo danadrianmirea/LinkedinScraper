@@ -25,13 +25,13 @@ salary = [ "$80,000+"]
 sort = ["Recent"]
 #Blacklist companies you dont want to apply - ex: ["Apple","Google"]
 #blacklistCompanies = ["luxoft", "harman", "rinf", "ubisoft", "sii", "thales", "orion", "luxolis", "randstad", "playtika", "playrix", "amazon", "von" ]
-blacklistCompanies = [""]
+blacklistCompanies = ""
 #blacklistCompanies = ["alten", "orion", "luxoft", "nxp"]
 #blacklistCompanies = ["luxoft", "rinf", "sii", "thales", "orion", "luxolis", "crossover", "randstad", "opentalent", "playrix", "amazon",
 #                      "consulting", "nagarro", "crowdstrike", "globallogic", "oasis", "electronic arts", "techteamz", "xpert", "talent", "tlm", "kambi", "playtika", "mega image", "mpg",
 #                      "frostbite", "avl" ];
 #Blaclist keywords in title - ex:["manager", ".Net"]
-blackListTitles = [""]
+blackListTitles = ""
 #blackListTitles = ["manager", "lead", "architect", "design", "devops", "devsecops", "security", "cyber", "crypto", "principal", "associate", "qa", "quality", "support", "test", "game", "gaming", "gameplay", "automation", "frontend", "backend", "stack", "java", "html", "web", "autosar", "cisco", "cloud", "site", "reliability", "head", "machine learning", "ai", "platform", "network", "angular", "ruby", "performance", "security", "statistical", "integrator", "build", "animation", "requirements", "sii", "node", "angular", "react", "french", "mobile", "sql", "mysql"]
 blackListDescription = ""
 #blackListDescription = ["game", "gaming", "unity", "unity3d", "unreal", "gameplay"]
@@ -41,4 +41,4 @@ followCompanies = False
 #Below settings are for linkedin bot Pro, you can purchase monthly or yearly subscription to use them from me.
 
  # Testing & Debugging features
-displayWarnings = False
+displayWarnings = True

@@ -118,15 +118,16 @@ class Linkedin:
                     jobDescription = self.getJobDescription()
                     
                     #first check if title and job description contain any of the goodTitles
-                    goodTitles = ["c++", "java", "python", "c#", "embedded"]
-                    goodDescriptions = ["c++", "java", "python", "c#", "embedded"]
+                    goodTitles = ["c", "c++", "java", "python", "c#", "embedded"]
+                    goodDescriptions = ["c", "c++", "java", "python", "c#", "embedded"]
                     
-                    goodTitles = ["c++", "embedded"]
-                    goodDescriptions = ["c++"]
+                    goodTitles = ["c++", "embedded", "c"]
+                    goodDescriptions = ["c++", "c"]
+                    badDescriptions = ["game", "gaming", "unity3d", "unreal", "gameplay"]
                     
                     checkTitle=1
-                    checkDescription=1
-                    checkBadDescription=1
+                    checkDescription=0
+                    checkBadDescription=0
                     
                     if checkTitle:
                         foundGoodTitle=False
@@ -154,7 +155,7 @@ class Linkedin:
                             
                     if checkBadDescription:
                         foundBadDesc = False;         
-                        for title in ["game", "gaming", "unity3d", "unreal", "gameplay"]:
+                        for title in badDescriptions:
                             if title in jobDescription.lower():
                                 foundBadDesc = True
                                 break;

@@ -21,9 +21,6 @@ botSpeed = fast
 # Webdriver Elements 
 totalJobs = "//small"
 offersPerPage = "//li[@data-occludable-job-id]"
-timeframe=2
-java=1
-toate=1
 outputFile = open("output.txt", "w+")
 logging.basicConfig(level=logging.WARNING)
 
@@ -110,7 +107,7 @@ def prYellow(prt):
 
         
 def scrape():
-    global timeframe,java, outputFile
+    global outputFile
     countJobs = 0
 
     for url in linkedinJobLinks:        

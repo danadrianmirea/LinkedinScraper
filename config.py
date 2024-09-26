@@ -1,11 +1,6 @@
 # General bot settings to use Pro settings you need to download Pro version from: www.automated-bots.com
 
 browser = ["Chrome"]
-# Enter your Linkedin password and username below. Do not commit this file after entering these credentials.
-# Linkedin credentials
-email = "YourLinkedin@UserEmail.com"
-password = "YourLinkedinPassword"
-
 headless = False
 
 # get Chrome profile path by typing following url: chrome://version/

@@ -174,10 +174,10 @@ class Linkedin:
                         continue
                     
                     jobAlreadySaved = False
-                    for fileLine in outputFile:
-                        if jobID in fileLine:
-                            jobAlreadySaved = True
-                            break
+                    fileContent = outputFile.read()                
+                    if jobID in fileContent:
+                        jobAlreadySaved = True
+                        break
      
                     if not jobAlreadySaved:
                         utils.prGreen("Saved job to File: " + offerPage)

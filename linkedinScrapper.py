@@ -9,6 +9,9 @@ from selenium.webdriver.chrome.options import Options
 from selenium.common.exceptions import *
 from typing import List
 
+# this is the link that the script uses for scraping, update with your own
+linkedinJobLinks = ["https://www.linkedin.com/jobs/search/?currentJobId=4012159218&f_WT=3%2C1&geoId=105773754&keywords=c%2B%2B&location=Bucharest%2C%20Romania&origin=JOB_SEARCH_PAGE_JOB_FILTER&refresh=true"]
+
 jobsPerPage = 25
 faster = 1
 fast = 2
@@ -18,7 +21,6 @@ botSpeed = fast
 # Webdriver Elements 
 totalJobs = "//small"
 offersPerPage = "//li[@data-occludable-job-id]"
-linkedinJobLinks = ["https://www.linkedin.com/jobs/search/?currentJobId=4012159218&f_WT=3%2C1&geoId=105773754&keywords=c%2B%2B&location=Bucharest%2C%20Romania&origin=JOB_SEARCH_PAGE_JOB_FILTER&refresh=true"]
 timeframe=2
 java=1
 toate=1

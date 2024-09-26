@@ -172,7 +172,7 @@ class Linkedin:
                         self.displayWriteResults(lineToWrite)
                         continue
                                                              
-                    utils.prYellow("Saved job to File: " + offerPage)
+                    utils.prGreen("Saved job to File: " + offerPage)
                     outputFile.write(offerPage + "\n")
                     outputFile.flush()
                      
@@ -198,7 +198,7 @@ class Linkedin:
 
         try:
             jobCompanyName = self.driver.find_element(By.XPATH, "//*[contains(@class, 'company-name')]").get_attribute("innerHTML").strip()
-            res = [blItem for blItem in config.blacklistCompanies if (blItem.lower() in jobTitle.lower())]
+            res = [blItem for blItem in config.blacklistCompanies if (blItem.lower() in jobCompanyName.lower())]
             if (len(res) > 0):
                 jobCompanyName = "(blacklisted company: " + ' '.join(res) + ")"
         except Exception as e:

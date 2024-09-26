@@ -224,7 +224,7 @@ class Linkedin:
                     print("***** Blacklisted description: "+ ' '.join(res))
         except Exception as e:
             if(config.displayWarnings):
-                prYellow("Warning in getting job description: " +str(e)[0:50])
+                utils.prYellow("Warning in getting job description: " +str(e)[0:50])
             description = ""
 
         return description

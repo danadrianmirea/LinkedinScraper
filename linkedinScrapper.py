@@ -39,7 +39,7 @@ sort = ["Recent"]
 blacklistCompanies = ""
 blacklistCompanies = ["luxoft", "rinf", "sii", "orion", "luxolis", "crossover", "randstad", "opentalent", "playrix", "amazon",
                       "consulting", "nagarro", "crowdstrike", "globallogic", "oasis", "techteamz", "xpert", "talent", 
-                      "tlm", "kambi", "playtika", "mega image", "mpg", "avl", "von", "think-cell", "think", "smartchoice"];
+                      "tlm", "kambi", "playtika", "mega image", "mpg", "avl", "von", "think-cell", "think", "smartchoice", "pentalog"];
 blackListTitles = ""
 blackListTitles = ["manager", "lead", "architect", "design", "devops", "devsecops", "security", "cyber", "crypto", "principal", "staff", "associate", "qa", 
                    "frontend", "fullstack", "backend", "web", "cisco", "reliability", "head", "machine learning", "angular", "ruby", "integrator", 
@@ -107,198 +107,185 @@ def prGreen(prt):
 def prYellow(prt):
     print(f"\033[93m{prt}\033[00m")
 
-class Linkedin:
-    def __init__(self):
-            self.driver = webdriver.Chrome(service=ChromeService(ChromeDriverManager().install()),options=chromeBrowserOptions())
-            self.driver.get("https://www.linkedin.com/login?trk=guest_homepage-basic_nav-header-signin")
-            
-            # uncomment these and put your own credentials
-            #self.driver.find_element("id","username").send_keys("")
-            #self.driver.find_element("id","password").send_keys("")
-            self.driver.find_element("xpath",'//button[@type="submit"]').click()
-                  
-            prYellow("Please log in to LinkedIn now, and then press ENTER.")
-            input()
-            
-            # start application
-            self.scrape()
-      
-    def scrape(self):
-        global timeframe,java, outputFile
-        
-        countApplied = 0
-        countJobs = 0
 
-        for url in linkedinJobLinks:        
-            self.driver.get(url)
+        
+def scrape():
+    global timeframe,java, outputFile
+    
+    countApplied = 0
+    countJobs = 0
+
+    for url in linkedinJobLinks:        
+        driver.get(url)
+        time.sleep(random.uniform(1, botSpeed))
+
+        totalJobs = driver.find_element(By.XPATH,'//small').text 
+        totalPages = jobsToPages(totalJobs)
+        prYellow("Parsing " +str(totalJobs)+ " jobs.")
+
+        for page in range(totalPages):
+            currentPageJobs = jobsPerPage * page
+            url = url +"&start="+ str(currentPageJobs)
+            driver.get(url)
             time.sleep(random.uniform(1, botSpeed))
 
-            totalJobs = self.driver.find_element(By.XPATH,'//small').text 
-            totalPages = jobsToPages(totalJobs)
-            prYellow("Parsing " +str(totalJobs)+ " jobs.")
+            offersPerPage = driver.find_elements(By.XPATH, '//li[@data-occludable-job-id]')
+            offerIds = [(offer.get_attribute(
+                "data-occludable-job-id").split(":")[-1]) for offer in offersPerPage]
+            time.sleep(random.uniform(1, botSpeed))
 
-            for page in range(totalPages):
-                currentPageJobs = jobsPerPage * page
-                url = url +"&start="+ str(currentPageJobs)
-                self.driver.get(url)
+            for offer in offersPerPage:
+                try:
+                    offerId = offer.get_attribute("data-occludable-job-id")
+                    offerIds.append(int(offerId.split(":")[-1]))
+                except Exception as e: 
+                    continue            
+
+            for jobID in offerIds:
+                offerPage = 'https://www.linkedin.com/jobs/view/' + str(jobID)
+                driver.get(offerPage)
                 time.sleep(random.uniform(1, botSpeed))
 
-                offersPerPage = self.driver.find_elements(By.XPATH, '//li[@data-occludable-job-id]')
-                offerIds = [(offer.get_attribute(
-                    "data-occludable-job-id").split(":")[-1]) for offer in offersPerPage]
-                time.sleep(random.uniform(1, botSpeed))
+                countJobs += 1
+                prYellow("Checking job at index " + str(countJobs))
 
-                for offer in offersPerPage:
-                    try:
-                       offerId = offer.get_attribute("data-occludable-job-id")
-                       offerIds.append(int(offerId.split(":")[-1]))
-                    except Exception as e: 
-                        continue            
-
-                for jobID in offerIds:
-                    offerPage = 'https://www.linkedin.com/jobs/view/' + str(jobID)
-                    self.driver.get(offerPage)
-                    time.sleep(random.uniform(1, botSpeed))
-
-                    countJobs += 1
-                    prYellow("Checking job at index " + str(countJobs))
-
-                    jobProperties = self.getJobProperties(countJobs)
-                    
-                    jobDescription = self.getJobDescription()
-                    
-                    #first check if title and job description contain any of the goodTitles
-                    goodTitles = [" c ", "c++", "java", "python", "c#", "embedded"]
-                    goodDescriptions = ["c ", "c++", "java", "python", "c#", "embedded"]
-                    
-                    goodTitles = ["c++", "embedded", " c "]
-                    goodDescriptions = ["c++", " c "]
-                    badDescriptions = ["game", "gaming", "unity", "unity3d", "unreal", "gameplay"]
-                    
-                    checkTitle=1
-                    checkDescription=0
-                    checkBadDescription=0
-                    
-                    if checkTitle and not "blacklisted" in jobProperties.lower():                        
-                        foundGoodTitle=False
-                        for title in goodTitles:
-                            if title in jobProperties.lower():
-                                foundGoodTitle=True
-                                break
-                            
-                        if foundGoodTitle is False:
-                            prYellow("No good title found in job title, skipping: " + str(offerPage))
-                            continue
-                                
-                    if checkDescription and not "blacklisted" in jobDescription.lower():
-                        foundGoodDesc=False
-                        for desc in goodDescriptions:
-                            if desc in jobDescription.lower():
-                                foundGoodDesc=True
-                                break  
-                                
-                        if foundGoodDesc is False:
-                            prYellow("No good description found in job description, skipping: " + str(offerPage))
-                            continue    
-                            
-                    if checkBadDescription:
-                        foundBadDesc = False;         
-                        for title in badDescriptions:
-                            if title in jobDescription.lower():
-                                foundBadDesc = True
-                                break
-                                
-                        if foundBadDesc is True:
-                            prYellow("Found bad title in jobDescription: " + title)
-                            continue      
-                 
-                    if "blacklisted" in jobProperties.lower():
-                        prYellow("Blacklisted Job, skipped: " +str(offerPage) + " reason: " + jobProperties)
-                        continue
+                jobProperties = getJobProperties(countJobs)
+                jobDescription = getJobDescription()
+                
+                #first check if title and job description contain any of the goodTitles
+                goodTitles = [" c ", "c++", "java", "python", "c#", "embedded"]
+                goodDescriptions = ["c ", "c++", "java", "python", "c#", "embedded"]
+                
+                goodTitles = ["c++", "embedded", " c "]
+                goodDescriptions = ["c++", " c "]
+                badDescriptions = ["game", "gaming", "unity", "unity3d", "unreal", "gameplay"]
+                
+                checkTitle=1
+                checkDescription=0
+                checkBadDescription=0
+                
+                if checkTitle and not "blacklisted" in jobProperties.lower():                        
+                    foundGoodTitle=False
+                    for title in goodTitles:
+                        if title in jobProperties.lower():
+                            foundGoodTitle=True
+                            break
                         
-                    if "blacklisted" in jobDescription.lower():
-                        prYellow("Blacklisted Job description, skipped!: " +str(offerPage) + " reason: " + jobProperties)
+                    if foundGoodTitle is False:
+                        prYellow("No good title found in job title, skipping: " + str(offerPage))
                         continue
+                            
+                if checkDescription and not "blacklisted" in jobDescription.lower():
+                    foundGoodDesc=False
+                    for desc in goodDescriptions:
+                        if desc in jobDescription.lower():
+                            foundGoodDesc=True
+                            break  
+                            
+                    if foundGoodDesc is False:
+                        prYellow("No good description found in job description, skipping: " + str(offerPage))
+                        continue    
+                        
+                if checkBadDescription:
+                    foundBadDesc = False;         
+                    for title in badDescriptions:
+                        if title in jobDescription.lower():
+                            foundBadDesc = True
+                            break
+                            
+                    if foundBadDesc is True:
+                        prYellow("Found bad title in jobDescription: " + title)
+                        continue      
+                
+                if "blacklisted" in jobProperties.lower():
+                    prYellow("Blacklisted Job, skipped: " +str(offerPage) + " reason: " + jobProperties)
+                    continue
                     
-                    jobAlreadySaved = False
-                    fileContent = outputFile.read()                
-                    if str(jobID) in fileContent:
-                        jobAlreadySaved = True
-                        break
-     
-                    if not jobAlreadySaved:
-                        prGreen("Saved job to File: " + offerPage)
-                        outputFile.write(offerPage + "\n")
-                        outputFile.flush()
-                    else:
-                        prGreen("Job already saved: " + offerPage)
-                     
-            prYellow("Category: " + urlWords[0] + "," +urlWords[1]+ " applied: " + str(countApplied) +
-                  " jobs out of " + str(countJobs) + ".")
+                if "blacklisted" in jobDescription.lower():
+                    prYellow("Blacklisted Job description, skipped!: " +str(offerPage) + " reason: " + jobProperties)
+                    continue
+                
+                jobAlreadySaved = False
+                fileContent = outputFile.read()                
+                if str(jobID) in fileContent:
+                    jobAlreadySaved = True
+                    break
+    
+                if not jobAlreadySaved:
+                    prGreen("Saved job to File: " + offerPage)
+                    outputFile.write(offerPage + "\n")
+                    outputFile.flush()
+                else:
+                    prGreen("Job already saved: " + offerPage)
 
-    def getJobProperties(self, count):
-        textToWrite = ""
+def getJobProperties(count):
+    textToWrite = ""
+    jobTitle = ""
+    jobLocation = ""
+    time.sleep(5) # wait for page to load
+
+    try:
+        jobTitle = driver.find_element(By.XPATH, "//*[contains(@class, 'job-title')]").get_attribute("innerHTML").strip()
+        res = [blItem for blItem in blackListTitles if (blItem.lower() in jobTitle.lower())]
+        if (len(res) > 0):
+            jobTitle = "(blacklisted title: " + ' '.join(res) + ")"
+    except Exception as e:
+        prYellow("Warning in getting jobTitle: " + str(e)[0:50])
         jobTitle = ""
+
+    try:
+        jobCompanyName = driver.find_element(By.XPATH, "//*[contains(@class, 'company-name')]").get_attribute("innerHTML").strip()
+        res = [blItem for blItem in blacklistCompanies if (blItem.lower() in jobCompanyName.lower())]
+        if (len(res) > 0):
+            jobCompanyName = "(blacklisted company: " + ' '.join(res) + ")"
+    except Exception as e:
+        print(e)
+        prYellow("Warning in getting jobDetail: " + str(e)[0:100])
+        jobCompanyName = ""
+
+    try:
+        jobWorkStatusSpans = driver.find_elements(By.XPATH, "//span[contains(@class,'ui-label ui-label--accent-3 text-body-small')]//span[contains(@aria-hidden,'true')]")
+        for span in jobWorkStatusSpans:
+            jobLocation = jobLocation + " | " + span.text
+
+    except Exception as e:
+        print(e)
+        prYellow("Warning in getting jobLocation: " + str(e)[0:100])
         jobLocation = ""
-        
-        time.sleep(5) # wait for page to load
 
-        try:
-            jobTitle = self.driver.find_element(By.XPATH, "//*[contains(@class, 'job-title')]").get_attribute("innerHTML").strip()
-            res = [blItem for blItem in blackListTitles if (blItem.lower() in jobTitle.lower())]
-            if (len(res) > 0):
-                jobTitle = "(blacklisted title: " + ' '.join(res) + ")"
-        except Exception as e:
-            prYellow("Warning in getting jobTitle: " + str(e)[0:50])
-            jobTitle = ""
+    if("blacklisted" in jobTitle):
+        textToWrite = jobTitle
+    elif("blacklisted" in jobCompanyName):
+        textToWrite = jobCompanyName
+    else:
+        textToWrite = str(count) + " | " + jobTitle +" | " + jobCompanyName + jobLocation
+    return textToWrite
 
-        try:
-            jobCompanyName = self.driver.find_element(By.XPATH, "//*[contains(@class, 'company-name')]").get_attribute("innerHTML").strip()
-            res = [blItem for blItem in blacklistCompanies if (blItem.lower() in jobCompanyName.lower())]
-            if (len(res) > 0):
-                jobCompanyName = "(blacklisted company: " + ' '.join(res) + ")"
-        except Exception as e:
-            print(e)
-            prYellow("Warning in getting jobDetail: " + str(e)[0:100])
-            jobCompanyName = ""
+def getJobDescription():
+    description = " "
+    try:
+        description= driver.find_element(By.ID,"job-details").get_attribute("innerHTML").strip()
+        if(len(blackListDescription) > 0):
+            res = [blItem for blItem in blackListDescription if(blItem.lower() in description.lower())]
+            if (len(res)>0):
+                description += "(blacklisted description: "+ ' '.join(res)+ ")"
+                print("***** Blacklisted description: "+ ' '.join(res))
+    except Exception as e:
+        prYellow("Warning in getting job description: " +str(e)[0:50])
+        description = ""
+    return description
 
-        try:
-            jobWorkStatusSpans = self.driver.find_elements(By.XPATH, "//span[contains(@class,'ui-label ui-label--accent-3 text-body-small')]//span[contains(@aria-hidden,'true')]")
-            for span in jobWorkStatusSpans:
-                jobLocation = jobLocation + " | " + span.text
-
-        except Exception as e:
-            print(e)
-            prYellow("Warning in getting jobLocation: " + str(e)[0:100])
-            jobLocation = ""
-
-        if("blacklisted" in jobTitle):
-            textToWrite = jobTitle
-        elif("blacklisted" in jobCompanyName):
-            textToWrite = jobCompanyName
-        else:
-            textToWrite = str(count) + " | " + jobTitle +" | " + jobCompanyName + jobLocation
-        return textToWrite
-
-    def getJobDescription(self):
-        description = " "
-        try:
-            description= self.driver.find_element(By.ID,"job-details").get_attribute("innerHTML").strip()
-            if(len(blackListDescription) > 0):
-                res = [blItem for blItem in blackListDescription if(blItem.lower() in description.lower())]
-                if (len(res)>0):
-                    description += "(blacklisted description: "+ ' '.join(res)+ ")"
-                    print("***** Blacklisted description: "+ ' '.join(res))
-        except Exception as e:
-            prYellow("Warning in getting job description: " +str(e)[0:50])
-            description = ""
-        return description
-
-    def prYellow(self,lineToWrite: str):
-        prYellow(lineToWrite)
-
+# main
 start = time.time()
-Linkedin().scrape()
+driver = webdriver.Chrome(service=ChromeService(ChromeDriverManager().install()),options=chromeBrowserOptions())
+driver.get("https://www.linkedin.com/login?trk=guest_homepage-basic_nav-header-signin")
+# uncomment these and put your own credentials
+#driver.find_element("id","username").send_keys("")
+#driver.find_element("id","password").send_keys("")
+driver.find_element("xpath",'//button[@type="submit"]').click()       
+prYellow("Please log in to LinkedIn now, and then press ENTER.")
+input()    
+scrape()
 end = time.time()
 prYellow("---Took: " + str(round((time.time() - start)/60)) + " minute(s).")
 outputFile.close()

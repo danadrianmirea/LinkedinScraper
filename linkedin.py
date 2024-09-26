@@ -1,4 +1,4 @@
-import time,math,random,os
+=import time,math,random,os
 import utils,constants,config
 import pickle, hashlib
 
@@ -127,7 +127,7 @@ class Linkedin:
                                 break;   
                             
                         if foundGoodTitle is False:
-                                lineToWrite = "No good title found in job title, skipping: "
+                                lineToWrite = "No good title found in job title, skipping: " + jobProperties
                                 self.displayWriteResults(lineToWrite)
                                 continue;   
                                 

@@ -1,18 +1,13 @@
 import time,math,random,os
-import utils,constants,config
+import config
 import pickle, hashlib
-
 import logging
-
 from selenium import webdriver
 from selenium.webdriver.common.by import By
-
 from webdriver_manager.chrome import ChromeDriverManager
 from selenium.webdriver.chrome.service import Service as ChromeService
 from selenium.webdriver.chrome.options import Options
-
 from selenium.common.exceptions import *
-
 from typing import List
 
 jobsPerPage = 25
@@ -21,33 +16,118 @@ fast = 2
 medium = 3
 slow = 5 
 botSpeed = fast
-
 # Webdriver Elements 
 totalJobs = "//small"
 offersPerPage = "//li[@data-occludable-job-id]"
 easyApplyButton = '//button[contains(@class, "jobs-apply-button")]'
-
-
-DEBUG = True
-
 linkedinJobLinks = ["https://www.linkedin.com/jobs/search/?currentJobId=4012159218&f_WT=3%2C1&geoId=105773754&keywords=c%2B%2B&location=Bucharest%2C%20Romania&origin=JOB_SEARCH_PAGE_JOB_FILTER&refresh=true"]
-
 timeframe=2
 java=1
 toate=1
 outputFile = open("output_apply.txt", "r+")
 logging.basicConfig(level=logging.WARNING)
 
-def log(s):
-    if DEBUG:
-        print(s)
-        
 # TODO: i have a feeling that not being logged in provides better search results on LinkedIn due to algorithm idiocy 
 # and promoted jobs not respecting search terms. Make the script work logged out
-        
+
+def urlToKeywords(url: str) -> List[str]:
+    keywordUrl = url[url.index("keywords=")+9:]
+    keyword = keywordUrl[0:keywordUrl.index("&") ] 
+    locationUrl =  url[url.index("location=")+9:]
+    location = locationUrl[0:locationUrl.index("&") ] 
+    return [keyword,location]
+
+def writeResults(text: str):
+    timeStr = time.strftime("%Y%m%d")
+    fileName = "Applied Jobs DATA - " +timeStr + ".txt"
+    try:
+        with open("data/" +fileName, encoding="utf-8" ) as file:
+            lines = []
+            for line in file:
+                if "----" not in line:
+                    lines.append(line)
+                
+        with open("data/" +fileName, 'w' ,encoding="utf-8") as f:
+            f.write("---- Applied Jobs Data ---- created at: " +timeStr+ "\n" )
+            f.write("---- Number | Job Title | Company | Location | Work Place | Posted Date | Applications | Result "   +"\n" )
+            for line in lines: 
+                f.write(line)
+            f.write(text+ "\n")
+            
+    except:
+        with open("data/" +fileName, 'w', encoding="utf-8") as f:
+            f.write("---- Applied Jobs Data ---- created at: " +timeStr+ "\n" )
+            f.write("---- Number | Job Title | Company | Location | Work Place | Posted Date | Applications | Result "   +"\n" )
+
+            f.write(text+ "\n")
+            
+def jobsToPages(numOfJobs: str) -> int:
+  number_of_pages = 1
+
+  if (' ' in numOfJobs):
+    spaceIndex = numOfJobs.index(' ')
+    totalJobs = (numOfJobs[0:spaceIndex])
+    totalJobs_int = int(totalJobs.replace(',', ''))
+    number_of_pages = math.ceil(totalJobs_int/constants.jobsPerPage)
+    if (number_of_pages > 40 ): number_of_pages = 40
+
+  else:
+      number_of_pages = int(numOfJobs)
+
+  return number_of_pages
+
+def getUrlDataFile():
+    urlData = ""
+    try:
+        file = open('data/urlData.txt', 'r')
+        urlData = file.readlines()
+    except FileNotFoundError:
+        text = "FileNotFound:urlData.txt file is not found. Please run ./data folder exists and check config.py values of yours. Then run the bot again"
+        prRed(text)
+    return urlData
+
+def chromeBrowserOptions():
+    options = webdriver.ChromeOptions()
+    options.add_argument('--no-sandbox')
+    options.add_argument("--ignore-certificate-errors")
+    options.add_argument("--disable-extensions")
+    options.add_argument('--disable-gpu')
+    options.add_argument('--disable-dev-shm-usage')
+    
+    options.add_argument("--log-level=3")  
+    options.add_argument("--disable-webrtc")
+    options.add_argument("--disable-features=WebRTC")
+    options.add_argument("--disable-features=WebRtcHideLocalIpsWithMdns")
+    options.add_argument("--disable-webassembly")
+
+    if(config.headless):
+        options.add_argument("--headless")
+    options.add_argument("--start-maximized")
+    options.add_argument("--disable-blink-features")
+    options.add_argument("--disable-blink-features=AutomationControlled")
+    options.add_experimental_option('useAutomationExtension', False)
+    options.add_experimental_option("excludeSwitches", ["enable-automation"])
+    if(len(config.chromeProfilePath)>0):
+        initialPath = config.chromeProfilePath[0:config.chromeProfilePath.rfind("/")]
+        profileDir = config.chromeProfilePath[config.chromeProfilePath.rfind("/")+1:]
+        options.add_argument('--user-data-dir=' +initialPath)
+        options.add_argument("--profile-directory=" +profileDir)
+    else:
+        options.add_argument("--incognito")
+    return options
+
+def prRed(prt):
+    print(f"\033[91m{prt}\033[00m")
+
+def prGreen(prt):
+    print(f"\033[92m{prt}\033[00m")
+
+def prYellow(prt):
+    print(f"\033[93m{prt}\033[00m")
+
 class Linkedin:
     def __init__(self):
-            self.driver = webdriver.Chrome(service=ChromeService(ChromeDriverManager().install()),options=utils.chromeBrowserOptions())
+            self.driver = webdriver.Chrome(service=ChromeService(ChromeDriverManager().install()),options=chromeBrowserOptions())
             self.driver.get("https://www.linkedin.com/login?trk=guest_homepage-basic_nav-header-signin")
             
             # uncomment these and put your own credentials
@@ -55,7 +135,7 @@ class Linkedin:
             #self.driver.find_element("id","password").send_keys("")    
             self.driver.find_element("xpath",'//button[@type="submit"]').click()
                   
-            utils.prYellow("Please log in to LinkedIn now, and then press ENTER.")
+            prYellow("Please log in to LinkedIn now, and then press ENTER.")
             input()
             
             # start application
@@ -84,16 +164,16 @@ class Linkedin:
         countApplied = 0
         countJobs = 0
 
-        urlData = utils.getUrlDataFile()
+        urlData = getUrlDataFile()
 
         for url in linkedinJobLinks:        
             self.driver.get(url)
             time.sleep(random.uniform(1, constants.botSpeed))
 
             totalJobs = self.driver.find_element(By.XPATH,'//small').text 
-            totalPages = utils.jobsToPages(totalJobs)
+            totalPages = jobsToPages(totalJobs)
 
-            urlWords =  utils.urlToKeywords(url)
+            urlWords =  urlToKeywords(url)
             urlWords = ["none", "none"]
             lineToWrite = "\n Category: " + urlWords[0] + ", Location: " +urlWords[1] + ", Applying " +str(totalJobs)+ " jobs."
             self.displayWriteResults(lineToWrite)
@@ -122,7 +202,7 @@ class Linkedin:
                     time.sleep(random.uniform(1, constants.botSpeed))
 
                     countJobs += 1
-                    utils.prYellow("Checking job at index " + str(countJobs)
+                    prYellow("Checking job at index " + str(countJobs))
 
                     jobProperties = self.getJobProperties(countJobs)
                     
@@ -193,13 +273,13 @@ class Linkedin:
                         break
      
                     if not jobAlreadySaved:
-                        utils.prGreen("Saved job to File: " + offerPage)
+                        prGreen("Saved job to File: " + offerPage)
                         outputFile.write(offerPage + "\n")
                         outputFile.flush()
                     else:
-                        utils.prGreen("Job already saved: " + offerPage)
+                        prGreen("Job already saved: " + offerPage)
                      
-            utils.prYellow("Category: " + urlWords[0] + "," +urlWords[1]+ " applied: " + str(countApplied) +
+            prYellow("Category: " + urlWords[0] + "," +urlWords[1]+ " applied: " + str(countApplied) +
                   " jobs out of " + str(countJobs) + ".")
 
     def getJobProperties(self, count):
@@ -216,7 +296,7 @@ class Linkedin:
                 jobTitle = "(blacklisted title: " + ' '.join(res) + ")"
         except Exception as e:
             if (config.displayWarnings):
-                utils.prYellow("Warning in getting jobTitle: " + str(e)[0:50])
+                prYellow("Warning in getting jobTitle: " + str(e)[0:50])
             jobTitle = ""
 
         try:
@@ -227,7 +307,7 @@ class Linkedin:
         except Exception as e:
             if (config.displayWarnings):
                 print(e)
-                utils.prYellow("Warning in getting jobDetail: " + str(e)[0:100])
+                prYellow("Warning in getting jobDetail: " + str(e)[0:100])
             jobCompanyName = ""
 
         try:
@@ -238,7 +318,7 @@ class Linkedin:
         except Exception as e:
             if (config.displayWarnings):
                 print(e)
-                utils.prYellow("Warning in getting jobLocation: " + str(e)[0:100])
+                prYellow("Warning in getting jobLocation: " + str(e)[0:100])
             jobLocation = ""
 
         if("blacklisted" in jobTitle):
@@ -260,7 +340,7 @@ class Linkedin:
                     print("***** Blacklisted description: "+ ' '.join(res))
         except Exception as e:
             if(config.displayWarnings):
-                utils.prYellow("Warning in getting job description: " +str(e)[0:50])
+                prYellow("Warning in getting job description: " +str(e)[0:50])
             description = ""
 
         return description
@@ -323,9 +403,9 @@ class Linkedin:
     def displayWriteResults(self,lineToWrite: str):
         try:
             print(lineToWrite)
-            utils.writeResults(lineToWrite)
+            writeResults(lineToWrite)
         except Exception as e:
-            utils.prRed("Error in DisplayWriteResults: " +str(e))
+            prRed("Error in DisplayWriteResults: " +str(e))
 
     def element_exists(self, parent, by, selector):
         return len(parent.find_elements(by, selector)) > 0
@@ -333,5 +413,5 @@ class Linkedin:
 start = time.time()
 Linkedin().linkJobApply()
 end = time.time()
-utils.prYellow("---Took: " + str(round((time.time() - start)/60)) + " minute(s).")
+prYellow("---Took: " + str(round((time.time() - start)/60)) + " minute(s).")
 outputFile.close()

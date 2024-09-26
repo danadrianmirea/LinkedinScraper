@@ -154,28 +154,7 @@ class Linkedin:
                             lineToWrite = "Found bad title in jobDescription: " + title
                             self.displayWriteResults(lineToWrite)
                             continue;       
-
-                            
-                    # TODO make the script output the Non Easy Apply jobs to a file by checking for the
-                    # button's innerHTML ("Easy Apply" vs "Apply")
-                    # do this so that they can be checked later on
- 
-                    #if java:
-                    #    #this means not in title
-                    #    if "java" not in jobProperties.lower():
-                    #        lineToWrite = " | " + "* java not found in jobDescription: "
-                    #        self.displayWriteResults(lineToWrite)
-                    #        continue;                                            
-                    #    #this means not in description
-                    #    if "java" not in jobDescription.lower():
-                    #        lineToWrite = " | " + "* java not found in jobDescription: "
-                    #        self.displayWriteResults(lineToWrite)
-                    #        continue;
-                    #elif "c++" not in jobDescription.lower():
-                    #    lineToWrite = " | " + "* C++ not found in jobDescription: "
-                    #    self.displayWriteResults(lineToWrite)
-                    #    continue;
-                                        
+                 
                     if "blacklisted" in jobProperties.lower():
                         lineToWrite = jobProperties + " | " + "* Blacklisted Job, skipped!: " +str(offerPage)
                         self.displayWriteResults(lineToWrite)

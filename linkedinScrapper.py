@@ -51,8 +51,6 @@ blackListDescription = ""
 # TODO: i have a feeling that not being logged in provides better search results on LinkedIn due to algorithm idiocy 
 # and promoted jobs not respecting search terms. Make the script work logged out
 
-# TODO: remove class
-
 def jobsToPages(numOfJobs: str) -> int:
   number_of_pages = 1
 

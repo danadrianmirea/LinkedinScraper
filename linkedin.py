@@ -35,8 +35,14 @@ class Linkedin:
             self.driver = webdriver.Chrome(service=ChromeService(ChromeDriverManager().install()),options=utils.chromeBrowserOptions())
             self.driver.get("https://www.linkedin.com/login?trk=guest_homepage-basic_nav-header-signin")
             
+            self.driver.find_element("id","username").send_keys("")
+            self.driver.find_element("id","password").send_keys("")
+            self.driver.find_element("xpath",'//button[@type="submit"]').click()
+                  
             utils.prYellow("Please log in to LinkedIn now, and then press ENTER.")
             input()
+            
+            
             
             # start application
             self.linkJobApply()
@@ -94,15 +100,16 @@ class Linkedin:
                        offerId = offer.get_attribute("data-occludable-job-id")
                        offerIds.append(int(offerId.split(":")[-1]))
                     except Exception as e: 
-                        continue                    
-                        
+                        continue            
+
                 for jobID in offerIds:
                     offerPage = 'https://www.linkedin.com/jobs/view/' + str(jobID)
                     self.driver.get(offerPage)
                     time.sleep(random.uniform(1, constants.botSpeed))
 
                     countJobs += 1
-
+                    utils.prYellow("Checking job at index " + str(countJobs) + "/" + str(totalJobs))
+                                   
                     jobProperties = self.getJobProperties(countJobs)
                     
                     jobDescription = self.getJobDescription()
@@ -119,49 +126,49 @@ class Linkedin:
                     checkDescription=0
                     checkBadDescription=0
                     
-                    if checkTitle:
+                    if checkTitle and not "blacklisted" in jobProperties.lower():                        
                         foundGoodTitle=False
                         for title in goodTitles:
                             if title in jobProperties.lower():
                                 foundGoodTitle=True
-                                break;   
+                                break
                             
                         if foundGoodTitle is False:
                                 lineToWrite = "No good title found in job title, skipping"
                                 self.displayWriteResults(lineToWrite)
-                                continue;   
+                                continue
                                 
-                    if checkDescription:  
+                    if checkDescription and not "blacklisted" in jobDescription.lower():
                         foundGoodDesc=False
                         for desc in goodDescriptions:
                             if desc in jobDescription.lower():
                                 foundGoodDesc=True
-                                break;  
+                                break  
                                 
                         if foundGoodDesc is False:
                                 lineToWrite = "No good description found in job description, skipping: "
                                 self.displayWriteResults(lineToWrite)
-                                continue;      
+                                continue    
                             
                     if checkBadDescription:
                         foundBadDesc = False;         
                         for title in badDescriptions:
                             if title in jobDescription.lower():
                                 foundBadDesc = True
-                                break;
+                                break
                                 
                         if foundBadDesc is True:
                             lineToWrite = "Found bad title in jobDescription: " + title
                             self.displayWriteResults(lineToWrite)
-                            continue;       
+                            continue      
                  
                     if "blacklisted" in jobProperties.lower():
-                        lineToWrite = jobProperties + " | " + "* Blacklisted Job, skipped!: " +str(offerPage)
+                        lineToWrite = "Blacklisted Job, skipped: " +str(offerPage) + " reason: " + jobProperties
                         self.displayWriteResults(lineToWrite)
                         continue
                         
                     if "blacklisted" in jobDescription.lower():
-                        lineToWrite = jobProperties + " | " + "* Blacklisted Job Description, skipped!: " +str(offerPage)
+                        lineToWrite = "Blacklisted Job description, skipped!: " +str(offerPage) + " reason: " + jobProperties
                         self.displayWriteResults(lineToWrite)
                         continue
                                                              
@@ -176,28 +183,29 @@ class Linkedin:
         textToWrite = ""
         jobTitle = ""
         jobLocation = ""
+        
+        time.sleep(5) # wait for page to load
 
         try:
-            jobTitle = self.driver.find_element(By.XPATH, "//div[contains(@class, 'job-title')]").get_attribute("innerHTML").strip()
+            jobTitle = self.driver.find_element(By.XPATH, "//*[contains(@class, 'job-title')]").get_attribute("innerHTML").strip()
             res = [blItem for blItem in config.blackListTitles if (blItem.lower() in jobTitle.lower())]
             if (len(res) > 0):
-                jobTitle += "(blacklisted title: " + ' '.join(res) + ")"
+                jobTitle = "(blacklisted title: " + ' '.join(res) + ")"
         except Exception as e:
             if (config.displayWarnings):
                 utils.prYellow("Warning in getting jobTitle: " + str(e)[0:50])
             jobTitle = ""
 
         try:
-            #time.sleep(5)
-            jobDetail = self.driver.find_element(By.XPATH, "//div[contains(@class, 'job-details-jobs')]//div").text.replace("·", "|")
+            jobCompanyName = self.driver.find_element(By.XPATH, "//*[contains(@class, 'company-name')]").get_attribute("innerHTML").strip()
             res = [blItem for blItem in config.blacklistCompanies if (blItem.lower() in jobTitle.lower())]
             if (len(res) > 0):
-                jobDetail += "(blacklisted company: " + ' '.join(res) + ")"
+                jobCompanyName = "(blacklisted company: " + ' '.join(res) + ")"
         except Exception as e:
             if (config.displayWarnings):
                 print(e)
                 utils.prYellow("Warning in getting jobDetail: " + str(e)[0:100])
-            jobDetail = ""
+            jobCompanyName = ""
 
         try:
             jobWorkStatusSpans = self.driver.find_elements(By.XPATH, "//span[contains(@class,'ui-label ui-label--accent-3 text-body-small')]//span[contains(@aria-hidden,'true')]")
@@ -210,7 +218,12 @@ class Linkedin:
                 utils.prYellow("Warning in getting jobLocation: " + str(e)[0:100])
             jobLocation = ""
 
-        textToWrite = str(count) + " | " + jobTitle +" | " + jobDetail + jobLocation
+        if("blacklisted" in jobTitle):
+            textToWrite = jobTitle
+        elif("blacklisted" in jobCompanyName):
+            textToWrite = jobCompanyName
+        else:
+            textToWrite = str(count) + " | " + jobTitle +" | " + jobCompanyName + jobLocation
         return textToWrite
 
     def getJobDescription(self):

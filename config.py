@@ -19,7 +19,6 @@ datePosted = ["Any Time"]
 jobType = ["Full-time"]
 #remote  - ex: ["On-site" , "Remote" , "Hybrid"]
 remote = ["Remote" , "Hybrid"]
-#salary - ex:["$40,000+", "$60,000+", "$80,000+", "$100,000+", "$120,000+", "$140,000+", "$160,000+", "$180,000+", "$200,000+" ] - select only one
 salary = [ "$80,000+"]
 #sort - ex:["Recent"] or ["Relevent"] - select only one
 sort = ["Recent"]
@@ -27,12 +26,12 @@ sort = ["Recent"]
 #blacklistCompanies = ["luxoft", "harman", "rinf", "ubisoft", "sii", "thales", "orion", "luxolis", "randstad", "playtika", "playrix", "amazon", "von" ]
 blacklistCompanies = ""
 #blacklistCompanies = ["alten", "orion", "luxoft", "nxp"]
-#blacklistCompanies = ["luxoft", "rinf", "sii", "thales", "orion", "luxolis", "crossover", "randstad", "opentalent", "playrix", "amazon",
-#                      "consulting", "nagarro", "crowdstrike", "globallogic", "oasis", "electronic arts", "techteamz", "xpert", "talent", "tlm", "kambi", "playtika", "mega image", "mpg",
-#                      "frostbite", "avl" ];
+blacklistCompanies = ["luxoft", "rinf", "sii", "thales", "orion", "luxolis", "crossover", "randstad", "opentalent", "playrix", "amazon",
+                      "consulting", "nagarro", "crowdstrike", "globallogic", "oasis", "electronic arts", "techteamz", "xpert", "talent", "tlm", "kambi", "playtika", "mega image", "mpg",
+                      "frostbite", "avl" ];
 #Blaclist keywords in title - ex:["manager", ".Net"]
-blackListTitles = ""
-#blackListTitles = ["manager", "lead", "architect", "design", "devops", "devsecops", "security", "cyber", "crypto", "principal", "associate", "qa", "quality", "support", "test", "game", "gaming", "gameplay", "automation", "frontend", "backend", "stack", "java", "html", "web", "autosar", "cisco", "cloud", "site", "reliability", "head", "machine learning", "ai", "platform", "network", "angular", "ruby", "performance", "security", "statistical", "integrator", "build", "animation", "requirements", "sii", "node", "angular", "react", "french", "mobile", "sql", "mysql"]
+#blackListTitles = ""
+blackListTitles = ["manager", "lead", "architect", "design", "devops", "devsecops", "security", "cyber", "crypto", "principal", "associate", "qa", "frontend", "backend", "web", "cisco", "site", "reliability", "head", "machine learning", "ai", "platform", "angular", "ruby", "statistical", "integrator", "animation", "requirements", "angular", "react", "french", "mobile", "mac"]
 blackListDescription = ""
 #blackListDescription = ["game", "gaming", "unity", "unity3d", "unreal", "gameplay"]
 #blackListDescription = ["devops", "devsecops", "cyber", "crypto", "principal", "associate", "game", "gaming", "gameplay", "java", "html", "web", "cisco", "cloud", "machine learning", "angular", "ruby", "statistical", "integrator", "animation", "sii", "node", "react", "french"]

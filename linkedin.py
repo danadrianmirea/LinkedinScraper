@@ -35,8 +35,10 @@ class Linkedin:
             self.driver = webdriver.Chrome(service=ChromeService(ChromeDriverManager().install()),options=utils.chromeBrowserOptions())
             self.driver.get("https://www.linkedin.com/login?trk=guest_homepage-basic_nav-header-signin")
             
-            self.driver.find_element("id","username").send_keys("")
-            self.driver.find_element("id","password").send_keys("")
+            # uncomment these and put your own credentials
+            #self.driver.find_element("id","username").send_keys("")
+            #self.driver.find_element("id","password").send_keys("")
+
             self.driver.find_element("xpath",'//button[@type="submit"]').click()
                   
             utils.prYellow("Please log in to LinkedIn now, and then press ENTER.")

@@ -127,7 +127,7 @@ class Linkedin:
                                 break;   
                             
                         if foundGoodTitle is False:
-                                lineToWrite = "No good title found in job title, skipping: " + jobProperties
+                                lineToWrite = "No good title found in job title, skipping"
                                 self.displayWriteResults(lineToWrite)
                                 continue;   
                                 
@@ -168,10 +168,7 @@ class Linkedin:
                     utils.prYellow("Saved job to File: " + offerPage + "\n")
                     outputFile.write(offerPage + "\n")
                     outputFile.flush()
- 
-                    lineToWrite = jobProperties + " | " + "* Saved job to " + str(outputFile) + ". " +str(offerPage)
-                    self.displayWriteResults(lineToWrite)
-                    
+                     
             utils.prYellow("Category: " + urlWords[0] + "," +urlWords[1]+ " applied: " + str(countApplied) +
                   " jobs out of " + str(countJobs) + ".")
 

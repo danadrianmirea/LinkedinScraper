@@ -11,8 +11,8 @@ from typing import List
 
 # TODO: i have a feeling that not being logged in provides better search results on LinkedIn due to algorithm idiocy
 # and promoted jobs not respecting search terms. Make the script work logged out
-
 # TODO: update script to look into the job description. It previously worked but needs checking and maintenance now
+# TODO: try headless mode
 
 # this is the link that the script uses for scraping, update with your own
 #linkedinJobLinks = ["https://www.linkedin.com/jobs/search/?currentJobId=4012159218&f_WT=3%2C1&geoId=105773754&keywords=c%2B%2B&location=Bucharest%2C%20Romania&origin=JOB_SEARCH_PAGE_JOB_FILTER&refresh=true"]

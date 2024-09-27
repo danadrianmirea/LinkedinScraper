@@ -211,7 +211,10 @@ def getJobProperties(count):
     textToWrite = ""
     jobTitle = ""
 
-    time.sleep(3) # wait for page to load
+    time.sleep(botMaxSpeed) # wait for page to load
+    # TODO try this: driver.execute_script("return document.readyState") == "complete"
+    # or, checking for individual elements:     
+    # element = WebDriverWait(driver, 10).until(EC.presence_of_element_located((By.XPATH, "//*[contains(@class, 'job-title')]"))
 
     try:
         jobTitle = driver.find_element(By.XPATH, "//*[contains(@class, 'job-title')]").get_attribute("innerHTML").strip()

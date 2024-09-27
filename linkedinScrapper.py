@@ -21,11 +21,12 @@ checkTitle=1
 checkDescription=0
 checkBadDescription=0
 
-goodTitles = [" c ", "c++", "java", "python", "c#", "embedded"]
-goodDescriptions = ["c ", "c++", "java", "python", "c#", "embedded"]
+#goodTitles = [" c ", "c++", "java", "python", "c#", "embedded"]
 goodTitles = ["c++", "embedded", " c "]
+#goodDescriptions = ["c ", "c++", "java", "python", "c#", "embedded"]
 goodDescriptions = ["c++", " c "]
-badDescriptions = ["game", "gaming", "unity", "unity3d", "unreal", "gameplay"]
+badDescriptions = ""
+#badDescriptions = ["game", "gaming", "unity", "unity3d", "unreal", "gameplay"]
 
 jobsPerPage = 25
 faster = 1

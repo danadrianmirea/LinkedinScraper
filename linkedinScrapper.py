@@ -29,16 +29,15 @@ logging.basicConfig(level=logging.WARNING)
 
 headless = False
 chromeProfilePath = r""
-location = "Bucharest, Romania"
 keywords = ["c++", "developer", "engineer", "c"]
 blacklistCompanies = ""
-blacklistCompanies = ["luxoft", "rinf", "sii", "orion", "luxolis", "crossover", "randstad", "opentalent", "playrix", "amazon",
-                      "consulting", "nagarro", "crowdstrike", "globallogic", "oasis", "techteamz", "xpert", "talent", 
-                      "tlm", "kambi", "playtika", "mega image", "mpg", "avl", "von", "think-cell", "think", "smartchoice", "pentalog"];
+#blacklistCompanies = ["luxoft", "rinf", "sii", "orion", "luxolis", "crossover", "randstad", "opentalent", "playrix", "amazon",
+#                      "consulting", "nagarro", "crowdstrike", "globallogic", "oasis", "techteamz", "xpert", "talent", 
+#                      "tlm", "kambi", "playtika", "mega image", "mpg", "avl", "von", "think-cell", "think", "smartchoice", "pentalog"];
 blackListTitles = ""
-blackListTitles = ["manager", "lead", "architect", "design", "devops", "devsecops", "security", "cyber", "crypto", "principal", "staff", "associate", "qa", 
-                   "frontend", "fullstack", "backend", "web", "cisco", "reliability", "head", "machine learning", "angular", "ruby", "integrator", 
-                   "angular", "react", "french", "mobile", "mac", "german", "spring", "java", "automation"]
+#blackListTitles = ["manager", "lead", "architect", "design", "devops", "devsecops", "security", "cyber", "crypto", "principal", "staff", "associate", "qa", 
+#                   "frontend", "fullstack", "backend", "web", "cisco", "reliability", "head", "machine learning", "angular", "ruby", "integrator", 
+#                   "angular", "react", "french", "mobile", "mac", "german", "spring", "java", "automation"]
 blackListDescription = ""
 #blackListDescription = ["game", "gaming", "unity", "unity3d", "unreal", "gameplay"]
 #blackListDescription = ["devops", "devsecops", "cyber", "crypto", "principal", "associate", "game", "gaming", "gameplay", "java", "html", "web", "cisco", "cloud", "machine learning", "angular", "ruby", "statistical", "integrator", "animation", "sii", "node", "react", "french"]
@@ -209,9 +208,8 @@ def scrape():
 def getJobProperties(count):
     textToWrite = ""
     jobTitle = ""
-    jobLocation = ""
-    
-    time.sleep(5) # wait for page to load
+
+    time.sleep(3) # wait for page to load
 
     try:
         jobTitle = driver.find_element(By.XPATH, "//*[contains(@class, 'job-title')]").get_attribute("innerHTML").strip()
@@ -232,22 +230,12 @@ def getJobProperties(count):
         prYellow("Warning in getting jobDetail: " + str(e)[0:100])
         jobCompanyName = ""
 
-    try:
-        jobWorkStatusSpans = driver.find_elements(By.XPATH, "//span[contains(@class,'ui-label ui-label--accent-3 text-body-small')]//span[contains(@aria-hidden,'true')]")
-        for span in jobWorkStatusSpans:
-            jobLocation = jobLocation + " | " + span.text
-
-    except Exception as e:
-        print(e)
-        prYellow("Warning in getting jobLocation: " + str(e)[0:100])
-        jobLocation = ""
-
     if("blacklisted" in jobTitle):
         textToWrite = jobTitle
     elif("blacklisted" in jobCompanyName):
         textToWrite = jobCompanyName
     else:
-        textToWrite = str(count) + " | " + jobTitle +" | " + jobCompanyName + jobLocation
+        textToWrite = str(count) + " | " + jobTitle +" | " + jobCompanyName
     return textToWrite
 
 def getJobDescription():

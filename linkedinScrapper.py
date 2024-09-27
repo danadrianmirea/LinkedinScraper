@@ -192,12 +192,14 @@ def scrape():
                     continue
                 
                 jobAlreadySaved = False
+                outputFile.seek(0, 0)
                 fileContent = outputFile.read()                
                 if str(jobID) in fileContent:
                     jobAlreadySaved = True
                     break
     
                 if not jobAlreadySaved:
+                    outputFile.seek(0, 2)
                     prGreen("Saved job to File: " + offerPage)
                     outputFile.write(offerPage + "\n")
                     outputFile.flush()

@@ -31,11 +31,8 @@ badDescriptions = ""
 #badDescriptions = ["game", "gaming", "unity", "unity3d", "unreal", "gameplay"]
 
 jobsPerPage = 25
-faster = 1
-fast = 2
-medium = 3
-slow = 5 
-botSpeed = fast
+botMinSpeed = 0.3
+botMaxSpeed = 2
 # Webdriver Elements 
 totalJobs = "//small"
 offersPerPage = "//li[@data-occludable-job-id]"
@@ -116,7 +113,7 @@ def scrape():
 
     for url in linkedinJobLinks:        
         driver.get(url)
-        time.sleep(random.uniform(1, botSpeed))
+        time.sleep(random.uniform(botMinSpeed, botMaxSpeed))
 
         totalJobs = driver.find_element(By.XPATH,'//small').text 
         totalPages = jobsToPages(totalJobs)
@@ -126,12 +123,12 @@ def scrape():
             currentPageJobs = jobsPerPage * page
             url = url +"&start="+ str(currentPageJobs)
             driver.get(url)
-            time.sleep(random.uniform(1, botSpeed))
+            time.sleep(random.uniform(botMinSpeed, botMaxSpeed))
 
             offersPerPage = driver.find_elements(By.XPATH, '//li[@data-occludable-job-id]')
             offerIds = [(offer.get_attribute(
                 "data-occludable-job-id").split(":")[-1]) for offer in offersPerPage]
-            time.sleep(random.uniform(1, botSpeed))
+            time.sleep(random.uniform(botMinSpeed, botMaxSpeed))
 
             for offer in offersPerPage:
                 try:
@@ -143,7 +140,7 @@ def scrape():
             for jobID in offerIds:
                 offerPage = 'https://www.linkedin.com/jobs/view/' + str(jobID)
                 driver.get(offerPage)
-                time.sleep(random.uniform(1, botSpeed))
+                time.sleep(random.uniform(botMinSpeed, botMaxSpeed))
 
                 countJobs += 1
                 prYellow("Checking job at index " + str(countJobs))

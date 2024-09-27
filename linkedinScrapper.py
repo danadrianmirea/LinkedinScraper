@@ -9,6 +9,9 @@ from selenium.webdriver.chrome.options import Options
 from selenium.common.exceptions import *
 from typing import List
 
+# TODO: i have a feeling that not being logged in provides better search results on LinkedIn due to algorithm idiocy
+# and promoted jobs not respecting search terms. Make the script work logged out
+
 # this is the link that the script uses for scraping, update with your own
 linkedinJobLinks = ["https://www.linkedin.com/jobs/search/?currentJobId=4012159218&f_WT=3%2C1&geoId=105773754&keywords=c%2B%2B&location=Bucharest%2C%20Romania&origin=JOB_SEARCH_PAGE_JOB_FILTER&refresh=true"]
 
@@ -39,9 +42,6 @@ blackListTitles = ["manager", "lead", "architect", "design", "devops", "devsecop
 blackListDescription = ""
 #blackListDescription = ["game", "gaming", "unity", "unity3d", "unreal", "gameplay"]
 #blackListDescription = ["devops", "devsecops", "cyber", "crypto", "principal", "associate", "game", "gaming", "gameplay", "java", "html", "web", "cisco", "cloud", "machine learning", "angular", "ruby", "statistical", "integrator", "animation", "sii", "node", "react", "french"]
-
-# TODO: i have a feeling that not being logged in provides better search results on LinkedIn due to algorithm idiocy
-# and promoted jobs not respecting search terms. Make the script work logged out
 
 def jobsToPages(numOfJobs: str) -> int:
   number_of_pages = 1

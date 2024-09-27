@@ -15,16 +15,18 @@ from typing import List
 # TODO: update script to look into the job description. It previously worked but needs checking and maintenance now
 
 # this is the link that the script uses for scraping, update with your own
-linkedinJobLinks = ["https://www.linkedin.com/jobs/search/?currentJobId=4012159218&f_WT=3%2C1&geoId=105773754&keywords=c%2B%2B&location=Bucharest%2C%20Romania&origin=JOB_SEARCH_PAGE_JOB_FILTER&refresh=true"]
+#linkedinJobLinks = ["https://www.linkedin.com/jobs/search/?currentJobId=4012159218&f_WT=3%2C1&geoId=105773754&keywords=c%2B%2B&location=Bucharest%2C%20Romania&origin=JOB_SEARCH_PAGE_JOB_FILTER&refresh=true"]
+
+linkedinJobLinks = ["https://www.linkedin.com/jobs/search/?currentJobId=4029165367&f_F=eng&f_WT=3%2C2&geoId=105773754&origin=JOB_SEARCH_PAGE_JOB_FILTER&refresh=true&sortBy=R"]
 
 checkTitle=1
 checkDescription=0
 checkBadDescription=0
 
-#goodTitles = [" c ", "c++", "java", "python", "c#", "embedded"]
-goodTitles = ["c++", "embedded", " c "]
+goodTitles = ["c ", "c++", "java", "python", "c#", "embedded"]
+#goodTitles = ["c++", "embedded", " c "]
 #goodDescriptions = ["c ", "c++", "java", "python", "c#", "embedded"]
-goodDescriptions = ["c++", " c "]
+goodDescriptions = ["c++", "c "]
 badDescriptions = ""
 #badDescriptions = ["game", "gaming", "unity", "unity3d", "unreal", "gameplay"]
 

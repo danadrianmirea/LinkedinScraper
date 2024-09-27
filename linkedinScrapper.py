@@ -12,8 +12,20 @@ from typing import List
 # TODO: i have a feeling that not being logged in provides better search results on LinkedIn due to algorithm idiocy
 # and promoted jobs not respecting search terms. Make the script work logged out
 
+# TODO: update script to look into the job description. It previously worked but needs checking and maintenance now
+
 # this is the link that the script uses for scraping, update with your own
 linkedinJobLinks = ["https://www.linkedin.com/jobs/search/?currentJobId=4012159218&f_WT=3%2C1&geoId=105773754&keywords=c%2B%2B&location=Bucharest%2C%20Romania&origin=JOB_SEARCH_PAGE_JOB_FILTER&refresh=true"]
+
+checkTitle=1
+checkDescription=0
+checkBadDescription=0
+
+goodTitles = [" c ", "c++", "java", "python", "c#", "embedded"]
+goodDescriptions = ["c ", "c++", "java", "python", "c#", "embedded"]
+goodTitles = ["c++", "embedded", " c "]
+goodDescriptions = ["c++", " c "]
+badDescriptions = ["game", "gaming", "unity", "unity3d", "unreal", "gameplay"]
 
 jobsPerPage = 25
 faster = 1
@@ -29,7 +41,6 @@ logging.basicConfig(level=logging.WARNING)
 
 headless = False
 chromeProfilePath = r""
-keywords = ["c++", "developer", "engineer", "c"]
 blacklistCompanies = ""
 #blacklistCompanies = ["luxoft", "rinf", "sii", "orion", "luxolis", "crossover", "randstad", "opentalent", "playrix", "amazon",
 #                      "consulting", "nagarro", "crowdstrike", "globallogic", "oasis", "techteamz", "xpert", "talent", 
@@ -138,16 +149,7 @@ def scrape():
                 jobDescription = getJobDescription()
                 
                 #first check if title and job description contain any of the goodTitles
-                goodTitles = [" c ", "c++", "java", "python", "c#", "embedded"]
-                goodDescriptions = ["c ", "c++", "java", "python", "c#", "embedded"]
-                
-                goodTitles = ["c++", "embedded", " c "]
-                goodDescriptions = ["c++", " c "]
-                badDescriptions = ["game", "gaming", "unity", "unity3d", "unreal", "gameplay"]
-                
-                checkTitle=1
-                checkDescription=0
-                checkBadDescription=0
+
                 
                 if checkTitle and not "blacklisted" in jobProperties.lower():                        
                     foundGoodTitle=False

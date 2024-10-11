@@ -33,7 +33,7 @@ badDescriptions = ""
 
 jobsPerPage = 25
 botMinSpeed = 0.3
-botMaxSpeed = 2
+botMaxSpeed = 3
 # Webdriver Elements 
 totalJobs = "//small"
 offersPerPage = "//li[@data-occludable-job-id]"
@@ -42,14 +42,15 @@ logging.basicConfig(level=logging.WARNING)
 
 headless = False
 chromeProfilePath = r""
-blacklistCompanies = ""
-#blacklistCompanies = ["luxoft", "rinf", "sii", "orion", "luxolis", "crossover", "randstad", "opentalent", "playrix", "amazon",
-#                      "consulting", "nagarro", "crowdstrike", "globallogic", "oasis", "techteamz", "xpert", "talent", 
-#                      "tlm", "kambi", "playtika", "mega image", "mpg", "avl", "von", "think-cell", "think", "smartchoice", "pentalog"];
-blackListTitles = ""
-#blackListTitles = ["manager", "lead", "architect", "design", "devops", "devsecops", "security", "cyber", "crypto", "principal", "staff", "associate", "qa", 
-#                   "frontend", "fullstack", "backend", "web", "cisco", "reliability", "head", "machine learning", "angular", "ruby", "integrator", 
-#                   "angular", "react", "french", "mobile", "mac", "german", "spring", "java", "automation"]
+
+blacklistCompanies = ["luxoft", "rinf", "sii", "orion", "luxolis", "crossover", "randstad", "opentalent", "playrix", "amazon",
+                      "consulting", "nagarro", "crowdstrike", "globallogic", "oasis", "techteamz", "xpert", "talent", 
+                      "tlm", "kambi", "playtika", "mega image", "mpg", "avl", "von", "think-cell", "think", "smartchoice", "pentalog", "adc"];
+
+blackListTitles = ["manager", "lead", "architect", "design", "devops", "devsecops", "security", "cyber", "crypto", "principal", "staff", "associate", "qa", 
+                  "frontend", "fullstack", "backend", "head", "machine learning", "angular", "ruby", "integrator", 
+                   "react", "french", "mobile", "mac", "german", "spring", "java", "automation", "quality", "intern", "support", "user"]
+
 blackListDescription = ""
 #blackListDescription = ["game", "gaming", "unity", "unity3d", "unreal", "gameplay"]
 #blackListDescription = ["devops", "devsecops", "cyber", "crypto", "principal", "associate", "game", "gaming", "gameplay", "java", "html", "web", "cisco", "cloud", "machine learning", "angular", "ruby", "statistical", "integrator", "animation", "sii", "node", "react", "french"]
@@ -268,6 +269,7 @@ driver.get("https://www.linkedin.com/login?trk=guest_homepage-basic_nav-header-s
 # uncomment these and put your own credentials
 #driver.find_element("id","username").send_keys("")
 #driver.find_element("id","password").send_keys("")
+
 driver.find_element("xpath",'//button[@type="submit"]').click()       
 prYellow("Please log in to LinkedIn now, and then press ENTER.")
 input()    

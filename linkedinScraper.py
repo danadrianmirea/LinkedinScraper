@@ -15,19 +15,22 @@ from typing import List
 # TODO: try headless mode
 
 # this is the link that the script uses for scraping, update with your own
-#linkedinJobLinks = ["https://www.linkedin.com/jobs/search/?currentJobId=4012159218&f_WT=3%2C1&geoId=105773754&keywords=c%2B%2B&location=Bucharest%2C%20Romania&origin=JOB_SEARCH_PAGE_JOB_FILTER&refresh=true"]
+linkedinJobLink = "https://www.linkedin.com/jobs/search/?currentJobId=4045708277&f_F=eng&f_T=9&f_WT=3%2C1&geoId=105773754&origin=JOB_SEARCH_PAGE_JOB_FILTER&refresh=true&sortBy=R"
 
-linkedinJobLinks = ["https://www.linkedin.com/jobs/search/?currentJobId=4001540352&f_F=eng%2Cit&f_TPR=r604800&f_WT=3%2C2&geoId=105773754&origin=JOB_SEARCH_PAGE_JOB_FILTER&refresh=true&sortBy=R"]
+#linkedinJobLinks = "https://www.linkedin.com/jobs/search/?currentJobId=3958799969&f_F=eng%2Cit&f_TPR=r86400&f_WT=3%2C2&geoId=105773754&origin=JOB_SEARCH_PAGE_JOB_FILTER&refresh=true&sortBy=R"
 
-checkTitle=1
-checkDescription=0
+linkedinJobLink = "https://www.linkedin.com/jobs/search/?currentJobId=4049200552&f_C=82589639&geoId=105773754&origin=JOB_SEARCH_PAGE_JOB_FILTER&refresh=true&sortBy=R"
+
+checkTitle=0
+checkDescription=1
 checkBadDescription=0
 
-goodTitles = ["c ", "c++", "embedded"]
+goodTitles = ["c ", "c++", "embed"]
+#goodTitles = ["embed"]
 #goodTitles = ["unity", "unity3d", "unreal", "gam"]
 #goodTitles = ["c++", "embedded", " c "]
 #goodDescriptions = ["c ", "c++", "java", "python", "c#", "embedded"]
-goodDescriptions = ["c++", "c "]
+goodDescriptions = ["c++", " c "]
 badDescriptions = ""
 #badDescriptions = ["game", "gaming", "unity", "unity3d", "unreal", "gameplay"]
 
@@ -45,11 +48,14 @@ chromeProfilePath = r""
 
 blacklistCompanies = ["luxoft", "rinf", "sii", "orion", "luxolis", "crossover", "randstad", "opentalent", "playrix", "amazon",
                       "consulting", "nagarro", "crowdstrike", "globallogic", "oasis", "techteamz", "xpert", "talent", 
-                      "tlm", "kambi", "playtika", "mega image", "mpg", "avl", "von", "think-cell", "think", "smartchoice", "pentalog", "adc"];
+                      "tlm", "kambi", "playtika", "mega image", "mpg", "avl", "von", "think-cell", "think", "smartchoice", "pentalog", "adc", "finastra"];
+blacklistCompanies = "" # no blacklist for now
 
 blackListTitles = ["manager", "lead", "architect", "design", "devops", "devsecops", "security", "cyber", "crypto", "principal", "staff", "associate", "qa", 
                   "frontend", "fullstack", "backend", "head", "machine learning", "angular", "ruby", "integrator", 
-                   "react", "french", "mobile", "mac", "german", "spring", "java", "automation", "quality", "intern", "support", "user"]
+                   "react", "french", "mobile", "mac", "german", "spring", "java", "automation", "quality", "intern", "user", "sap", "administrator", 
+                   "deutsch", "packaging", "erp", "oracle", "consult", "forensic"]
+blackListTitles = ""    # no blacklist for now
 
 blackListDescription = ""
 #blackListDescription = ["game", "gaming", "unity", "unity3d", "unreal", "gameplay"]
@@ -112,102 +118,102 @@ def prYellow(prt):
 def scrape():
     global outputFile
     countJobs = 0
+    url = linkedinJobLink
+    
+    driver.get(url)
+    time.sleep(random.uniform(botMinSpeed, botMaxSpeed))
 
-    for url in linkedinJobLinks:        
+    totalJobs = driver.find_element(By.XPATH,'//small').text 
+    totalPages = jobsToPages(totalJobs)
+    prYellow("Parsing " +str(totalJobs)+ " jobs.")
+
+    for page in range(totalPages):
+        currentPageJobs = jobsPerPage * page
+        url = url +"&start="+ str(currentPageJobs)
         driver.get(url)
         time.sleep(random.uniform(botMinSpeed, botMaxSpeed))
 
-        totalJobs = driver.find_element(By.XPATH,'//small').text 
-        totalPages = jobsToPages(totalJobs)
-        prYellow("Parsing " +str(totalJobs)+ " jobs.")
+        offersPerPage = driver.find_elements(By.XPATH, '//li[@data-occludable-job-id]')
+        offerIds = [(offer.get_attribute(
+            "data-occludable-job-id").split(":")[-1]) for offer in offersPerPage]
+        time.sleep(random.uniform(botMinSpeed, botMaxSpeed))
 
-        for page in range(totalPages):
-            currentPageJobs = jobsPerPage * page
-            url = url +"&start="+ str(currentPageJobs)
-            driver.get(url)
+        for offer in offersPerPage:
+            try:
+                offerId = offer.get_attribute("data-occludable-job-id")
+                offerIds.append(int(offerId.split(":")[-1]))
+            except Exception as e: 
+                continue            
+
+        for jobID in offerIds:
+            offerPage = 'https://www.linkedin.com/jobs/view/' + str(jobID)
+            driver.get(offerPage)
             time.sleep(random.uniform(botMinSpeed, botMaxSpeed))
 
-            offersPerPage = driver.find_elements(By.XPATH, '//li[@data-occludable-job-id]')
-            offerIds = [(offer.get_attribute(
-                "data-occludable-job-id").split(":")[-1]) for offer in offersPerPage]
-            time.sleep(random.uniform(botMinSpeed, botMaxSpeed))
+            countJobs += 1
+            prYellow("Checking job at index " + str(countJobs))
 
-            for offer in offersPerPage:
-                try:
-                    offerId = offer.get_attribute("data-occludable-job-id")
-                    offerIds.append(int(offerId.split(":")[-1]))
-                except Exception as e: 
-                    continue            
+            jobProperties = getJobProperties(countJobs)
+            jobDescription = getJobDescription()
+            
+            #first check if title and job description contain any of the goodTitles
 
-            for jobID in offerIds:
-                offerPage = 'https://www.linkedin.com/jobs/view/' + str(jobID)
-                driver.get(offerPage)
-                time.sleep(random.uniform(botMinSpeed, botMaxSpeed))
-
-                countJobs += 1
-                prYellow("Checking job at index " + str(countJobs))
-
-                jobProperties = getJobProperties(countJobs)
-                jobDescription = getJobDescription()
-                
-                #first check if title and job description contain any of the goodTitles
-
-                
-                if checkTitle and not "blacklisted" in jobProperties.lower():                        
-                    foundGoodTitle=False
-                    for title in goodTitles:
-                        if title in jobProperties.lower():
-                            foundGoodTitle=True
-                            break
-                        
-                    if foundGoodTitle is False:
-                        prYellow("No good title found in job title, skipping: " + str(offerPage))
-                        continue
-                            
-                if checkDescription and not "blacklisted" in jobDescription.lower():
-                    foundGoodDesc=False
-                    for desc in goodDescriptions:
-                        if desc in jobDescription.lower():
-                            foundGoodDesc=True
-                            break  
-                            
-                    if foundGoodDesc is False:
-                        prYellow("No good description found in job description, skipping: " + str(offerPage))
-                        continue    
-                        
-                if checkBadDescription:
-                    foundBadDesc = False;         
-                    for title in badDescriptions:
-                        if title in jobDescription.lower():
-                            foundBadDesc = True
-                            break
-                            
-                    if foundBadDesc is True:
-                        prYellow("Found bad title in jobDescription: " + title)
-                        continue      
-                
-                if "blacklisted" in jobProperties.lower():
-                    prYellow("Blacklisted Job, skipped: " +str(offerPage) + " reason: " + jobProperties)
-                    continue
+            
+            if checkTitle and not "blacklisted" in jobProperties.lower():                        
+                foundGoodTitle=False
+                for title in goodTitles:
+                    if title in jobProperties.lower():
+                        foundGoodTitle=True
+                        break
                     
-                if "blacklisted" in jobDescription.lower():
-                    prYellow("Blacklisted Job description, skipped!: " +str(offerPage) + " reason: " + jobProperties)
+                if foundGoodTitle is False:
+                    prYellow("No good title found in job title, skipping: " + str(offerPage))
                     continue
+                        
+            if checkDescription and not "blacklisted" in jobDescription.lower():
+                foundGoodDesc=False
+                for desc in goodDescriptions:
+                    if desc in jobDescription.lower():
+                        foundGoodDesc=True
+                        break  
+                        
+                if foundGoodDesc is False:
+                    prYellow("No good description found in job description, skipping: " + str(offerPage))
+                    continue    
+                    
+            if checkBadDescription:
+                foundBadDesc = False;         
+                for title in badDescriptions:
+                    if title in jobDescription.lower():
+                        foundBadDesc = True
+                        break
+                        
+                if foundBadDesc is True:
+                    prYellow("Found bad title in jobDescription: " + title)
+                    continue      
+            
+            if "blacklisted" in jobProperties.lower():
+                prYellow("Blacklisted Job, skipped: " +str(offerPage) + " reason: " + jobProperties)
+                continue
                 
-                jobAlreadySaved = False
-                outputFile.seek(0, 0)
-                fileContent = outputFile.read()                
-                if str(jobID) in fileContent:
-                    jobAlreadySaved = True
-                    break
-    
-                if not jobAlreadySaved:
-                    outputFile.seek(0, 2)
-                    prGreen("Saved job to File: " + offerPage)
-                    outputFile.write(offerPage + "\n")
-                    outputFile.flush()
-                else:
-                    prGreen("Job already saved: " + offerPage)
+            if "blacklisted" in jobDescription.lower():
+                prYellow("Blacklisted Job description, skipped!: " +str(offerPage) + " reason: " + jobProperties)
+                continue
+            
+            jobAlreadySaved = False
+            outputFile.seek(0, 0)
+            fileContent = outputFile.read()                
+            if str(jobID) in fileContent:
+                jobAlreadySaved = True
+                break
+
+            if not jobAlreadySaved:
+                outputFile.seek(0, 2)
+                prGreen("Saved job to File: " + offerPage)
+                outputFile.write(offerPage + "\n")
+                outputFile.flush()
+            else:
+                prGreen("Job already saved: " + offerPage)
 
 def getJobProperties(count):
     textToWrite = ""
@@ -269,7 +275,6 @@ driver.get("https://www.linkedin.com/login?trk=guest_homepage-basic_nav-header-s
 # uncomment these and put your own credentials
 #driver.find_element("id","username").send_keys("")
 #driver.find_element("id","password").send_keys("")
-
 driver.find_element("xpath",'//button[@type="submit"]').click()       
 prYellow("Please log in to LinkedIn now, and then press ENTER.")
 input()    
